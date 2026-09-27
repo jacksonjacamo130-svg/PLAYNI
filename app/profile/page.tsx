@@ -68,7 +68,7 @@ export default function ProfilePage(){
         <div className="profile-section-title"><Settings2 size={17}/><span>CUENTA Y SEGURIDAD</span></div>
         <div className="profile-menu-card">
           <button type="button" className="profile-menu-row profile-notifications-link" onClick={()=>{window.location.href="/profile/notifications";}}><div className="profile-menu-icon"><Bell size={18}/></div><div><strong>Notificaciones</strong><span>Preferencias de avisos de PLAYNI</span></div><ChevronRight size={17}/></button>
-          <div className="profile-menu-row"><div className="profile-menu-icon"><KeyRound size={18}/></div><div><strong>Contraseña</strong><span>Administración de acceso a tu cuenta</span></div><em>Próximamente</em><ChevronRight size={17}/></div>
+          <Link href="/profile/password" className="profile-menu-row profile-menu-link"><div className="profile-menu-icon"><KeyRound size={18}/></div><div><strong>Contraseña</strong><span>Cambia la contraseña de tu cuenta</span></div><ChevronRight size={17}/></Link>
         </div>
       </section>
       <button className="profile-logout" onClick={logout}><LogOut size={17}/> CERRAR SESIÓN</button>
