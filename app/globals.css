@@ -346,3 +346,37 @@ button,a{font:inherit}
   box-shadow:none!important;
   background-image:none!important;
 }
+
+
+/* PLAYNI — TARGETED NOTIFICATIONS LINK */
+.profile-notifications-link,
+.profile-notifications-link:link,
+.profile-notifications-link:visited,
+.profile-notifications-link:hover,
+.profile-notifications-link:focus,
+.profile-notifications-link:active{
+  text-decoration: none !important;
+  text-decoration-line: none !important;
+  text-decoration-color: transparent !important;
+  -webkit-text-decoration: none !important;
+  color: inherit !important;
+  border: 0 !important;
+  border-bottom: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.profile-notifications-link::before,
+.profile-notifications-link::after{
+  content: none !important;
+  display: none !important;
+}
+.profile-notifications-link strong,
+.profile-notifications-link span{
+  text-decoration: none !important;
+  text-decoration-line: none !important;
+  text-decoration-color: transparent !important;
+  border: 0 !important;
+  background-image: none !important;
+}
