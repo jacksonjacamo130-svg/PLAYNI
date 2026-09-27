@@ -48,3 +48,10 @@ button,a{font:inherit}.topbar{height:68px;display:flex;align-items:center;justif
 .offer-link{width:100%;margin-top:14px;padding:12px;border-radius:9px;background:#ffc83d;color:#111827;text-decoration:none;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:4px}
 .offers-empty{grid-column:1/-1;border:1px dashed #303a4f;border-radius:18px;background:#121927;padding:30px;text-align:center;color:#858da0;display:flex;flex-direction:column;gap:8px;line-height:1.5}
 .offers-empty strong{color:#fff;font-size:15px}
+
+/* Authentication and logo sizing fixes */
+.brand-logo{width:42px;height:42px;object-fit:contain;display:block;flex:none}
+.auth-logo{width:112px;height:auto;max-height:112px;object-fit:contain;border-radius:0;display:block}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;margin:0 0 18px;background:#111827;border:1px solid #293246;border-radius:12px}
+.auth-tabs button{border:0;background:transparent;color:#858da0;border-radius:9px;padding:10px 7px;font-size:10px;font-weight:900;cursor:pointer}
+.auth-tabs button.active{background:#ffc83d;color:#111827}
