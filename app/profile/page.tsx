@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { UserCircle2, ShieldCheck, LogOut, Mail, MapPin, UserRound, Bell, KeyRound, Settings2, ChevronRight, CalendarDays, Badge, VenusAndMars } from "lucide-react";
+import { UserCircle2, ShieldCheck, LogOut, Mail, MapPin, UserRound, Bell, KeyRound, Settings2, ChevronRight } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import BottomNav from "../components/BottomNav";
 
@@ -61,9 +61,9 @@ export default function ProfilePage(){
             <div className="profile-info-row"><div className="profile-info-icon"><Mail size={18}/></div><div><span>Correo</span><strong>{email||"Cargando..."}</strong></div></div>
             <div className="profile-info-row"><div className="profile-info-icon"><UserRound size={18}/></div><div><span>Nombre</span><strong>{name}</strong></div></div>
             <div className="profile-info-row"><div className="profile-info-icon"><MapPin size={18}/></div><div><span>País</span><strong>{country}</strong></div></div>
-            <div className="profile-info-row"><div className="profile-info-icon"><VenusAndMars size={18}/></div><div><span>Género</span><strong>{gender}</strong></div></div>
-            <div className="profile-info-row"><div className="profile-info-icon"><CalendarDays size={18}/></div><div><span>Fecha de nacimiento</span><strong>{birthDate}</strong></div></div>
-            <div className="profile-info-row"><div className="profile-info-icon"><Badge size={18}/></div><div><span>ID de usuario</span><strong>{userId||"Cargando..."}</strong></div></div>
+            <div className="profile-info-row"><div className="profile-info-icon"><UserRound size={18}/></div><div><span>Género</span><strong>{gender}</strong></div></div>
+            <div className="profile-info-row"><div className="profile-info-icon"><Clock3 size={18}/></div><div><span>Fecha de nacimiento</span><strong>{birthDate}</strong></div></div>
+            <div className="profile-info-row"><div className="profile-info-icon"><ShieldCheck size={18}/></div><div><span>ID de usuario</span><strong>{userId||"Cargando..."}</strong></div></div>
           </div>
         </div>
       </section>
