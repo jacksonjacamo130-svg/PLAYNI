@@ -2,22 +2,92 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Gamepad2, WalletCards, ChevronRight, Coins, Clock3, ShieldCheck, Sparkles, LoaderCircle, ListChecks } from "lucide-react";
+import { Coins, ChevronRight, Clock3, LoaderCircle, Search, ShieldCheck, Sparkles, UserCircle2, Gamepad2 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import BottomNav from "./components/BottomNav";
 
 type PlayOffer = { id:string; title:string; description:string; category:string; icon:string; landingPage:string; tasks:{name:string;reward:number|null}[]; daysLeft:number|null };
 
 export default function HomePage(){
-  const [name,setName]=useState("Jugador"), [balance,setBalance]=useState("0.00"), [offers,setOffers]=useState<PlayOffer[]>([]), [loading,setLoading]=useState(true);
-  useEffect(()=>{(async()=>{const {data:{session}}=await supabase.auth.getSession();if(!session){window.location.replace("/login");return;}const [{data:p},{data:w}]=await Promise.all([supabase.from("profiles").select("full_name,display_name").eq("id",session.user.id).maybeSingle(),supabase.from("wallets").select("coins").eq("user_id",session.user.id).maybeSingle()]);setName(p?.full_name?.trim().split(" ")[0]||p?.display_name||"Jugador");setBalance(((w?.coins??0)/1000).toFixed(2));try{const res=await fetch("/api/offers",{headers:{Authorization:"Bearer "+session.access_token}});const data=await res.json();setOffers(data.offers??[]);}catch{}setLoading(false);})()},[]);
-  return <main className="app-shell home-simple">
-    <header className="topbar"><Link className="brand" href="/"><img className="brand-logo" src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI"/></Link><Link className="balance account-balance" href="/wallet"><Coins size={16}/><strong>{"$"+balance}</strong><ChevronRight size={14}/></Link></header>
-    <section className="home-welcome"><div><span className="eyebrow"><Sparkles size={13}/> PLAYNI</span><h1>Hola, {name} 👋</h1><p>Elige una oferta y empieza a ganar.</p></div><Link className="home-profile" href="/profile">Mi perfil</Link></section>
-    <section className="earn-hero"><div><span className="eyebrow">TU SALDO</span><strong>{"$"+balance}</strong><span>Disponible en tu billetera</span></div><Link href="/games" className="primary-btn">GANAR AHORA <ChevronRight size={18}/></Link></section>
-    <section className="home-games-first"><div className="simple-head"><div><span className="eyebrow"><Sparkles size={13}/> PARA TI</span><h2>Juegos que puedes empezar</h2></div><Link href="/games">Ver todos <ChevronRight size={15}/></Link></div>{loading?<div className="simple-empty"><LoaderCircle className="spin" size={22}/><span>Buscando juegos...</span></div>:offers.length?<div className="home-game-strip">{offers.slice(0,3).map(o=><article className="home-game-card" key={o.id}><div className="home-game-image">{o.icon?<img src={o.icon} alt=""/>:<Gamepad2 size={42}/>}<span>{o.category}</span></div><div className="home-game-info"><h3>{o.title}</h3><p>{o.tasks.length||1} objetivos · {o.daysLeft!=null?o.daysLeft+" días":"tiempo limitado"}</p><a href={o.landingPage} target="_blank" rel="noreferrer">JUGAR <ChevronRight size={15}/></a></div></article>)}</div>:<div className="no-real-offers home-no-offers"><div className="no-offers-icon"><Gamepad2 size={28}/></div><h3>Tus juegos aparecerán aquí</h3><p>Estamos conectando las campañas reales disponibles para tu país y dispositivo.</p><Link href="/games">VER OFERTAS</Link></div>}</section>
-    <section className="simple-section"><div className="simple-head"><div><span className="eyebrow">TU PROGRESO</span><h2>Mis tareas</h2></div><Link href="/tasks">Ver mis tareas <ChevronRight size={15}/></Link></div><div className="continue-card"><div className="continue-icon"><ListChecks size={23}/></div><div><strong>Continúa donde quedaste</strong><p>Las ofertas que empieces aparecerán aquí con tus objetivos y progreso.</p></div><ChevronRight size={20}/></div></section>
-    <section className="how-simple"><span className="eyebrow">MUY FÁCIL</span><h2>¿Cómo ganas?</h2><div className="mini-steps"><div><b>1</b><span>Elige</span></div><div><b>2</b><span>Juega</span></div><div><b>3</b><span>Completa</span></div><div><b>4</b><span>Retira</span></div></div><p><ShieldCheck size={15}/> Cada objetivo validado suma a tu saldo.</p></section>
-    <BottomNav />
+  const [name,setName]=useState("Jugador"), [balance,setBalance]=useState("0.00"), [offers,setOffers]=useState<PlayOffer[]>([]), [loading,setLoading]=useState(true), [query,setQuery]=useState("");
+
+  useEffect(()=>{(async()=>{
+    const {data:{session}}=await supabase.auth.getSession();
+    if(!session){window.location.replace("/login");return;}
+    const [{data:p},{data:w}]=await Promise.all([
+      supabase.from("profiles").select("full_name,display_name").eq("id",session.user.id).maybeSingle(),
+      supabase.from("wallets").select("coins").eq("user_id",session.user.id).maybeSingle()
+    ]);
+    setName(p?.full_name?.trim().split(" ")[0]||p?.display_name||"Jugador");
+    setBalance(((w?.coins??0)/1000).toFixed(2));
+    try{
+      const res=await fetch("/api/offers",{headers:{Authorization:"Bearer "+session.access_token}});
+      const data=await res.json();
+      setOffers(data.offers??[]);
+    }catch{}
+    setLoading(false);
+  })()},[]);
+
+  const filtered=offers.filter(o=>(o.title+" "+o.category+" "+o.description).toLowerCase().includes(query.toLowerCase()));
+
+  return <main className="app-shell discover-page">
+    <header className="topbar discover-topbar">
+      <Link className="brand" href="/" aria-label="PLAYNI">
+        <img className="brand-logo brand-logo-hero" src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI"/>
+      </Link>
+      <div className="discover-actions">
+        <Link className="balance account-balance" href="/wallet"><Coins size={16}/><strong>{"$"+balance}</strong><ChevronRight size={14}/></Link>
+        <Link className="profile-circle" href="/profile" aria-label="Mi perfil"><UserCircle2 size={28}/></Link>
+      </div>
+    </header>
+
+    <section className="discover-welcome">
+      <div>
+        <span className="eyebrow"><Sparkles size={13}/> DESCUBRIR</span>
+        <h1>Hola, {name} 👋</h1>
+        <p>Encuentra una oferta, empieza a jugar y gana recompensas.</p>
+      </div>
+    </section>
+
+    <section className="discover-offers">
+      <div className="discover-heading">
+        <div>
+          <span className="eyebrow">OFERTAS DISPONIBLES</span>
+          <h2>Juegos para ti</h2>
+        </div>
+        <span className="discover-count">{offers.length} disponibles</span>
+      </div>
+
+      <label className="discover-search">
+        <Search size={18}/>
+        <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar juegos y ofertas"/>
+      </label>
+
+      {loading ? <div className="discover-loading"><LoaderCircle className="spin" size={25}/><span>Buscando ofertas disponibles...</span></div> :
+      filtered.length ? <div className="discover-grid">{filtered.map(o=><article className="discover-card" key={o.id}>
+        <div className="discover-cover">
+          {o.icon?<img src={o.icon} alt=""/>:<div className="discover-cover-placeholder"><Gamepad2 size={48}/></div>}
+          <span>{o.category}</span>
+        </div>
+        <div className="discover-card-body">
+          <div className="discover-card-title">
+            <h3>{o.title}</h3>
+            <strong>+{o.tasks.reduce((a,t)=>a+(t.reward??0),0)} coins</strong>
+          </div>
+          <p>{o.description||"Completa objetivos dentro del juego para recibir recompensas."}</p>
+          <div className="discover-meta"><span><Clock3 size={14}/>{o.daysLeft!=null?o.daysLeft+" días":"Tiempo limitado"}</span><span>{o.tasks.length||1} objetivos</span></div>
+          <a className="discover-cta" href={o.landingPage} target="_blank" rel="noreferrer">VER OFERTA <ChevronRight size={17}/></a>
+        </div>
+      </article>)}</div> :
+      <div className="no-real-offers discover-empty">
+        <div className="no-offers-icon"><Gamepad2 size={32}/></div>
+        <h2>{query ? "No encontramos esa oferta" : "Todavía no hay ofertas disponibles"}</h2>
+        <p>{query ? "Prueba con otro nombre o categoría." : "Las campañas reales aparecerán aquí cuando estén disponibles para tu país y dispositivo."}</p>
+        <span>No mostramos juegos falsos ni recompensas inventadas.</span>
+      </div>}
+    </section>
+
+    <section className="discover-trust"><ShieldCheck size={17}/><span>Completa objetivos válidos y tus recompensas se reflejarán en tu billetera.</span></section>
+    <BottomNav/>
   </main>;
 }
