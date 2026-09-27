@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Compass, ListChecks, WalletCards } from "lucide-react";
+import { Compass, ListChecks, WalletCards, UserCircle2 } from "lucide-react";
 
 const items = [
   { href: "/", label: "Descubrir", icon: Compass },
   { href: "/tasks", label: "Mis tareas", icon: ListChecks },
   { href: "/wallet", label: "Billetera", icon: WalletCards },
+  { href: "/profile", label: "Perfil", icon: UserCircle2 },
 ];
 
 export default function BottomNav() {
@@ -18,7 +19,7 @@ export default function BottomNav() {
         const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
         return (
           <Link key={href} className={active ? "active" : ""} href={href}>
-            <Icon size={22} strokeWidth={2.15} />
+            <Icon size={21} strokeWidth={2.15} />
             <span>{label}</span>
           </Link>
         );
