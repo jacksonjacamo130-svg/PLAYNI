@@ -13,7 +13,7 @@ type Task = {
 };
 
 type StartedOffer = {
-  id:string; title:string; description:string; icon_url:string|null;
+  id:string; title:string; description:string; icon_url:string|null; landing_url:string;
   category:string; platform:string; reward_coins:number; started_at:string;
   deadline_at:string|null; install_confirmed:boolean; progress_percent:number;
   status:"active"|"completed"|"expired"; user_offer_tasks:Task[];
@@ -42,7 +42,7 @@ export default function TasksPage(){
     if(!user){window.location.replace("/login");return;}
     const {data,error}=await supabase
       .from("user_offers")
-      .select("id,title,description,icon_url,category,platform,reward_coins,started_at,deadline_at,install_confirmed,progress_percent,status,user_offer_tasks(id,name,reward_coins,status,completed_at)")
+      .select("id,title,description,icon_url,landing_url,category,platform,reward_coins,started_at,deadline_at,install_confirmed,progress_percent,status,user_offer_tasks(id,name,reward_coins,status,completed_at)")
       .eq("user_id",user.id)
       .order("started_at",{ascending:false});
     if(!error) setOffers((data??[]) as StartedOffer[]);
@@ -86,8 +86,14 @@ export default function TasksPage(){
               <div className={styles.startedOfferInfo}><div className={styles.startedOfferNameRow}><h2>{o.title}</h2><span className={styles.startedStatus+" "+styles.active}>ACTIVA</span></div><p>{o.description||"Completa los objetivos para ganar tus recompensas."}</p><div className={styles.startedOfferMeta}><span><TimerReset size={14}/> Iniciada {formatDate(o.started_at)}</span><span><Clock3 size={14}/> {o.deadline_at ? "Hasta " + formatDate(o.deadline_at) : "Sin límite"}</span></div></div>
             </div>
             <div className={styles.startedProgress}><div className={styles.startedProgressTop}><span>Progreso</span><strong>{progress}%</strong></div><div className={styles.startedProgressTrack}><span style={{width:progress+"%"}}/></div></div>
-            <div className={styles.installState}><Smartphone size={15}/><span>{o.install_confirmed?"Instalación confirmada":"Instalación pendiente de verificación"}</span></div>
+            <div className={styles.gameSummary}>
+              <span><strong>{o.reward_coins}</strong> coins</span>
+              <span><strong>{o.user_offer_tasks.filter(t=>t.status!=="pending").length}/{o.user_offer_tasks.length||0}</strong> objetivos</span>
+              <span><strong>{o.deadline_at ? Math.max(0,Math.ceil((new Date(o.deadline_at).getTime()-Date.now())/86400000)) : "—"}</strong> días</span>
+            </div>
+            <div className={styles.installState}><Smartphone size={15}/><span>{o.install_confirmed?"Instalación confirmada":"Instalación pendiente"}</span></div>
             <div className={styles.goalList}>{o.user_offer_tasks.length?o.user_offer_tasks.map(t=><div className={styles.goalRow} key={t.id}>{t.status==="pending"?<Circle size={17}/>:<CheckCircle2 size={17}/>}<span>{t.name}</span>{t.reward_coins!=null&&<strong>+{t.reward_coins}</strong>}</div>):<div className={styles.goalRow+" "+styles.goalEmpty}><Circle size={17}/><span>Los objetivos aparecerán cuando el proveedor los envíe.</span></div>}</div>
+            <Link href={o.landing_url} target="_blank" rel="noreferrer" className={styles.continueButton}>CONTINUAR JUEGO <Gamepad2 size={16}/></Link>
           </article>
         })}</section>}
 
