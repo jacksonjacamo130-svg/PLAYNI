@@ -255,3 +255,11 @@ button,a{font:inherit}
   .topbar{padding:0 14px}
   .topbar .brand-logo,.brand-logo-hero,.wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo,.inner-page-topbar .brand-logo{width:42px;height:42px}
 }
+
+/* PLAYNI final header polish */
+.topbar .brand-logo,.brand-logo-hero,.wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo,.inner-page-topbar .brand-logo{width:58px;height:58px;object-fit:contain}
+.notification-title,.notifications-title,.notification-section-title{border-bottom:none!important;text-decoration:none!important;background-image:none!important}
+.notification-title::after,.notifications-title::after,.notification-section-title::after{display:none!important;content:none!important}
+@media(max-width:800px){
+ .topbar .brand-logo,.brand-logo-hero,.wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo,.inner-page-topbar .brand-logo{width:50px;height:50px}
+}
