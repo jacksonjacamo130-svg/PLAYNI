@@ -69,14 +69,14 @@ export default function TasksPage(){
       <Link className="brand" href="/">
         <img className="brand-logo" src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI"/>
       </Link>
-      <div className="page-title"><ListChecks size={20}/><span>MIS TAREAS</span></div>
+      <div className="page-title"><ListChecks size={20}/><span>MIS JUEGOS</span></div>
     </header>
 
     <section className="simple-section tasks-section">
-      <div className="simple-head"><div><span className="eyebrow">TU PROGRESO</span><h1>Mis tareas</h1></div></div>
+      <div className="simple-head"><div><span className="eyebrow">TU PROGRESO</span><h1>Mis juegos</h1></div></div>
 
       {loading ? <div className={styles.tasksLoading}><LoaderCircle className="spin" size={26}/><span>Cargando tus juegos...</span></div> :
-      offers.length===0 ? <div className="tasks-empty"><div className="continue-icon"><Gamepad2 size={25}/></div><h2>Aún no tienes tareas</h2><p>Cuando empieces una oferta, aparecerá aquí con sus objetivos, progreso y tiempo restante.</p><Link className="primary-btn" href="/">DESCUBRIR OFERTAS <Gamepad2 size={17}/></Link></div> :
+      offers.length===0 ? <div className="tasks-empty"><div className="continue-icon"><Gamepad2 size={25}/></div><h2>Aún no tienes juegos iniciados</h2><p>Cuando empieces una oferta, aparecerá aquí con sus objetivos, progreso y tiempo restante.</p><Link className="primary-btn" href="/">DESCUBRIR OFERTAS <Gamepad2 size={17}/></Link></div> :
       <div className={styles.startedOffersList}>
         {sections.active.length>0 && <section className={styles.taskGroup}><div className={styles.taskGroupTitle}><span>ACTIVAS</span><strong>{sections.active.length}</strong></div>{sections.active.map(o=>{
           const progress=progressFor(o);
