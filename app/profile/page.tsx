@@ -37,14 +37,11 @@ export default function ProfilePage(){
       <Link className="brand" href="/"><img className="brand-logo" src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI"/></Link>
       <div className="page-title"><UserCircle2 size={20}/><span>PERFIL</span></div>
     </header>
-
     <section className="profile-content">
       <div className="profile-intro">
-        <span className="eyebrow">TU CUENTA</span>
-        <h1>Mi perfil</h1>
+        <span className="eyebrow">TU CUENTA</span><h1>Mi perfil</h1>
         <p>Administra la información y las opciones de tu cuenta PLAYNI.</p>
       </div>
-
       <section className="profile-section">
         <div className="profile-section-title"><UserRound size={17}/><span>INFORMACIÓN PERSONAL</span></div>
         <div className="profile-card">
@@ -56,18 +53,15 @@ export default function ProfilePage(){
           </div>
         </div>
       </section>
-
       <section className="profile-section">
         <div className="profile-section-title"><Settings2 size={17}/><span>CUENTA Y SEGURIDAD</span></div>
         <div className="profile-menu-card">
-          <div className="profile-menu-row"><div className="profile-menu-icon"><Bell size={18}/></div><div><strong>Notificaciones</strong><span>Preferencias de avisos de PLAYNI</span></div><em>Próximamente</em><ChevronRight size={17}/></div>
+          <Link className="profile-menu-row" href="/profile/notifications"><div className="profile-menu-icon"><Bell size={18}/></div><div><strong>Notificaciones</strong><span>Preferencias de avisos de PLAYNI</span></div><ChevronRight size={17}/></Link>
           <div className="profile-menu-row"><div className="profile-menu-icon"><KeyRound size={18}/></div><div><strong>Contraseña</strong><span>Administración de acceso a tu cuenta</span></div><em>Próximamente</em><ChevronRight size={17}/></div>
         </div>
       </section>
-
       <button className="profile-logout" onClick={logout}><LogOut size={17}/> CERRAR SESIÓN</button>
     </section>
-
     <BottomNav />
   </main>;
 }
