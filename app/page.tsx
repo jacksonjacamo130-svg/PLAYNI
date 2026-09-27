@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Gamepad2, Gift, Home, User, WalletCards, ChevronRight, Coins, Clock3, ShieldCheck, Sparkles, LogOut, LoaderCircle } from "lucide-react";
+import { Gamepad2, Gift, Home, User, WalletCards, ChevronRight, Coins, Clock3, ShieldCheck, Sparkles, LoaderCircle } from "lucide-react";
 import { supabase } from "../lib/supabase";
 
 type PlayOffer = {
@@ -25,7 +25,6 @@ export default function HomePage() {
   const [profile, setProfile] = useState<{full_name: string | null; display_name: string | null; country_code: string; phone_verified: boolean} | null>(null);
   const [wallet, setWallet] = useState<{coins: number; lifetime_earned: number}>({ coins: 0, lifetime_earned: 0 });
   const [loading, setLoading] = useState(true);
-  const [signingOut, setSigningOut] = useState(false);
   const [offers, setOffers] = useState<PlayOffer[]>([]);
   const [offersLoading, setOffersLoading] = useState(false);
 
@@ -48,32 +47,25 @@ export default function HomePage() {
     return () => { mounted = false; };
   }, []);
 
-  async function signOut() {
-    setSigningOut(true);
-    await supabase.auth.signOut({ scope: "local" });
-    window.location.href = "/login";
-  }
-
   const firstName = profile?.full_name?.trim().split(" ")[0] || profile?.display_name || "Jugador";
   const balance = (wallet.coins / 1000).toFixed(2);
 
   return (
     <main className="app-shell">
       <header className="topbar">
-        <div className="brand">
+        <a className="brand" href="/" aria-label="PLAYNI inicio">
           <img className="brand-logo" src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI" />
-          <span>PLAYNI</span>
-        </div>
+        </a>
         {loading ? (
   <div className="balance"><LoaderCircle size={16} className="spin" /></div>
 ) : profile ? (
-  <button className="balance account-balance" onClick={signOut} disabled={signingOut}><Coins size={17} /><strong>${balance}</strong><LogOut size={14} /></button>
+  <a className="balance account-balance" href="/wallet" aria-label="Abrir billetera"><Coins size={17} /><strong>${balance}</strong><ChevronRight size={14} /></a>
 ) : (
   <a className="balance" href="/login" aria-label="Iniciar sesión"><Coins size={17} /><strong>INICIAR SESIÓN</strong></a>
 )}
       </header>
 
-      {profile && <section className="welcome-bar"><div><span className="eyebrow">TU CUENTA</span><h2>Hola, {firstName} 👋</h2><p>Tu saldo y tus ganancias se actualizan desde tu cuenta PLAYNI.</p></div><div className="verified-pill">✓ TELÉFONO VERIFICADO</div></section>}
+      {profile && <section className="welcome-bar" id="cuenta"><div><span className="eyebrow">TU CUENTA</span><h2>Hola, {firstName} 👋</h2><p>Tu saldo y tus ganancias se actualizan desde tu cuenta PLAYNI.</p></div><div className="verified-pill">✓ TELÉFONO VERIFICADO</div></section>}
 
       <section className="hero">
         <div className="hero-copy">
@@ -106,7 +98,7 @@ export default function HomePage() {
       <section className="section" id="ofertas">
         <div className="section-head">
           <div><span className="eyebrow">PARA TI</span><h2>Empieza a ganar</h2></div>
-          <a href="#">Ver todas <ChevronRight size={16} /></a>
+          <a href="#ofertas">Ver todas <ChevronRight size={16} /></a>
         </div>
         <div className="game-grid">
           {offersLoading ? (
@@ -146,18 +138,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="daily">
+      <section className="daily" id="bono">
         <div className="daily-icon">🎁</div>
         <div><strong>Bono diario</strong><p>Vuelve cada día para descubrir nuevas oportunidades.</p></div>
-        <button>VER BONO</button>
+        <a className="daily-button" href="#ofertas">VER OFERTAS</a>
       </section>
 
       <nav className="bottom-nav">
         <a className="active" href="/"><Home size={21} /><span>Inicio</span></a>
         <a href="#ofertas"><Gamepad2 size={21} /><span>Juegos</span></a>
-        <a><Gift size={21} /><span>Premios</span></a>
+        <a href="#bono"><Gift size={21} /><span>Premios</span></a>
         <a href="/wallet"><WalletCards size={21} /><span>Billetera</span></a>
-        <a><User size={21} /><span>Perfil</span></a>
+        <a href={profile ? "#cuenta" : "/login"}><User size={21} /><span>Perfil</span></a>
       </nav>
     </main>
   );
