@@ -309,3 +309,7 @@ button,a{font:inherit}
     transform:scale(1.38)!important;
   }
 }
+
+/* PLAYNI — REMOVE PROFILE LINK UNDERLINE */
+.profile-menu-row,.profile-menu-row:visited,.profile-menu-row:hover,.profile-menu-row:focus,.profile-menu-row:active{ text-decoration:none!important; }
+.profile-menu-row strong,.profile-menu-row span,.profile-menu-row em{ text-decoration:none!important; }
