@@ -4,20 +4,28 @@ import { useEffect, useState } from "react";
 import { Gamepad2, Gift, Home, User, WalletCards, ChevronRight, Coins, Clock3, ShieldCheck, Sparkles, LogOut, LoaderCircle } from "lucide-react";
 import { supabase } from "../lib/supabase";
 
-const offers = [
-  { title: "MONOPOLY GO!", category: "Tablero", reward: "$12.40", goal: "Alcanza el nivel 10", icon: "🎲" },
-  { title: "Coin Master", category: "Estrategia", reward: "$9.80", goal: "Completa la aldea 5", icon: "🪙" },
-  { title: "Royal Match", category: "Puzzle", reward: "$8.50", goal: "Completa 100 niveles", icon: "👑" },
-  { title: "Domino Dreams", category: "Casual", reward: "$7.20", goal: "Alcanza el nivel 15", icon: "🁫" },
-  { title: "Travel Town", category: "Merge", reward: "$11.60", goal: "Llega al nivel 20", icon: "🏝️" },
-  { title: "Dice Dreams", category: "Estrategia", reward: "$10.30", goal: "Completa 5 aldeas", icon: "🎲" },
-];
+type PlayOffer = {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  icon: string;
+  landingPage: string;
+  platform: string;
+  conversionType: string | null;
+  tasks: { id: string | null; name: string; reward: number | null; status: string | null }[];
+  offerStatus: string;
+  daysLeft: number | null;
+  impressionUrl: string | null;
+};
+
+
 
 export default function HomePage() {
   const [profile, setProfile] = useState<{full_name: string | null; display_name: string | null; country_code: string; phone_verified: boolean} | null>(null);
   const [wallet, setWallet] = useState<{coins: number; lifetime_earned: number}>({ coins: 0, lifetime_earned: 0 });
   const [loading, setLoading] = useState(true);
-  const [signingOut, setSigningOut] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);\n  const [offers, setOffers] = useState<PlayOffer[]>([]);\n  const [offersLoading, setOffersLoading] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -99,20 +107,30 @@ export default function HomePage() {
           <a href="#">Ver todas <ChevronRight size={16} /></a>
         </div>
         <div className="game-grid">
-          {offers.map((offer) => (
-            <article className="game-card" key={offer.title}>
-              <div className="game-cover">
-                <span className="game-icon">{offer.icon}</span>
-                <span className="offer-badge">HASTA {offer.reward}</span>
-              </div>
-              <div className="game-info">
-                <span className="tag">{offer.category}</span>
-                <h3>{offer.title}</h3>
-                <p><Clock3 size={14} /> {offer.goal}</p>
-                <button>VER OFERTA <ChevronRight size={16} /></button>
-              </div>
-            </article>
-          ))}
+          {offersLoading ? (
+            <div className="offers-empty">Cargando ofertas reales disponibles para tu cuenta…</div>
+          ) : offers.length ? (
+            offers.map((offer) => (
+              <article className="game-card" key={offer.id}>
+                <div className="game-cover">
+                  {offer.icon ? <img className="game-offer-icon" src={offer.icon} alt="" /> : <span className="game-icon">🎮</span>}
+                  {offer.tasks[0]?.reward != null && <span className="offer-badge">RECOMPENSA DISPONIBLE</span>}
+                </div>
+                <div className="game-info">
+                  <span className="tag">{offer.category}</span>
+                  <h3>{offer.title}</h3>
+                  <p><Clock3 size={14} /> {offer.tasks[0]?.name || "Completa los objetivos indicados"}</p>
+                  {offer.daysLeft != null && <small className="offer-days">Tiempo restante: {offer.daysLeft} días</small>}
+                  <a className="offer-link" href={offer.landingPage} target="_blank" rel="noreferrer">VER OFERTA <ChevronRight size={16} /></a>
+                </div>
+              </article>
+            ))
+          ) : (
+            <div className="offers-empty">
+              <strong>Estamos preparando tus ofertas</strong>
+              <span>Las ofertas de juegos aparecerán aquí cuando el proveedor esté conectado y haya campañas disponibles para tu país y dispositivo.</span>
+            </div>
+          )}
         </div>
       </section>
 
