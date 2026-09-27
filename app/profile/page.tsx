@@ -56,8 +56,7 @@ export default function ProfilePage(){
       <section className="profile-section">
         <div className="profile-section-title"><UserRound size={17}/><span>DATOS PERSONALES</span></div>
         <div className="profile-card">
-          <div className="profile-head"><div className="profile-avatar"><UserCircle2 size={42}/></div><div><strong className="profile-name">{name}</strong><span className="profile-id-sub">{userId||"Cargando..."}</span></div></div>
-          <div className="profile-info-list">
+          <div className="profile-info-list profile-info-list-first">
             <div className="profile-info-row"><div className="profile-info-icon"><Mail size={18}/></div><div><span>Correo</span><strong>{email||"Cargando..."}</strong></div></div>
             <div className="profile-info-row"><div className="profile-info-icon"><MapPin size={18}/></div><div><span>País</span><strong>{country}</strong></div></div>
             <div className="profile-info-row"><div className="profile-info-icon"><UserRound size={18}/></div><div><span>Género</span><strong>{gender}</strong></div></div>
