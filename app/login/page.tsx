@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { ArrowLeft, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
 const countries = [
@@ -61,7 +61,6 @@ export default function LoginPage() {
   return (
     <main className="auth-page">
       <section className="auth-card">
-        <a className="auth-back" href="/"><ArrowLeft size={18} /> Volver</a>
         <div className="auth-logo-wrap"><img className="auth-logo" src={logoUrl} alt="PLAYNI" /></div>
         <div className="auth-heading">
           <span className="auth-kicker">PLAYNI</span>
