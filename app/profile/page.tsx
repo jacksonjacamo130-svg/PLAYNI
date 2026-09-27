@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { UserCircle2, ShieldCheck, LogOut, Mail, MapPin, UserRound, Bell, KeyRound, Settings2, ChevronRight } from "lucide-react";
+import { UserCircle2, ShieldCheck, LogOut, Mail, MapPin, UserRound, Bell, KeyRound, Settings2, ChevronRight, Clock3 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import BottomNav from "../components/BottomNav";
 
