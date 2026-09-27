@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Gamepad2, Gift, Home, User, WalletCards, Flame, ChevronRight, Coins, Clock3, ShieldCheck, Sparkles } from "lucide-react";
 
 const offers = [
@@ -13,7 +14,10 @@ export default function HomePage() {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <div className="brand"><span className="brand-mark">P</span><span>PLAYNI</span></div>
+        <div className="brand">
+          <Image src="/logo-playni.png" alt="PLAYNI" width={42} height={42} priority />
+          <span>PLAYNI</span>
+        </div>
         <button className="balance" aria-label="Ver saldo"><Coins size={17} /><strong>$0.00</strong></button>
       </header>
 
