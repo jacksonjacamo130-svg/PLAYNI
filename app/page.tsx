@@ -18,7 +18,7 @@ export default function HomePage() {
           <Image src="/logo-playni.png" alt="PLAYNI" width={42} height={42} priority />
           <span>PLAYNI</span>
         </div>
-        <button className="balance" aria-label="Ver saldo"><Coins size={17} /><strong>$0.00</strong></button>
+        <a className="balance" href="/login" aria-label="Iniciar sesión"><Coins size={17} /><strong>INICIAR SESIÓN</strong></a>
       </header>
 
       <section className="hero">
@@ -27,7 +27,7 @@ export default function HomePage() {
           <h1>Tu próxima<br /><span>recompensa</span><br />empieza aquí.</h1>
           <p>Elige un juego, completa objetivos y mira cómo tus ganancias aumentan paso a paso.</p>
           <div className="hero-actions">
-            <button className="primary-btn">EXPLORAR JUEGOS <ChevronRight size={18} /></button>
+            <a className="primary-btn" href="/login">EMPEZAR A GANAR <ChevronRight size={18} /></a>
             <span className="trust"><ShieldCheck size={15} /> Sin costo para empezar</span>
           </div>
         </div>
