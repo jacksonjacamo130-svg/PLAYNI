@@ -3,9 +3,9 @@ html,body{margin:0;padding:0;background:#0b0f1a;color:#f8f8fb;font-family:Arial,
 body{min-height:100vh}
 button,a{font:inherit}
 .app-shell{min-height:100vh;padding-bottom:92px;width:100%;overflow-x:hidden}
-.topbar{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,5vw,72px);border-bottom:1px solid #202637;background:#0b0f1a;position:sticky;top:0;z-index:20}
-.brand{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:900;letter-spacing:.08em;min-width:0;text-decoration:none;color:inherit}.brand span{white-space:nowrap}.brand-mark{display:grid;place-items:center;width:35px;height:35px;border-radius:10px;background:#ffc83d;color:#111827}
-.brand-logo{width:42px;height:42px;object-fit:contain;display:block;flex:none}
+.topbar{height:74px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,5vw,72px);border-bottom:1px solid #202637;background:#0b0f1a;position:sticky;top:0;z-index:20}
+.brand{display:flex;align-items:center;gap:10px;height:100%;font-size:21px;font-weight:900;letter-spacing:.08em;min-width:0;text-decoration:none;color:inherit}.brand span{white-space:nowrap}.brand-mark{display:grid;place-items:center;width:35px;height:35px;border-radius:10px;background:#ffc83d;color:#111827}
+.brand-logo{width:54px;height:54px;object-fit:contain;display:block;flex:none}
 .balance{display:flex;align-items:center;gap:8px;border:1px solid #30384b;background:#151b2a;color:#d7d9e5;padding:9px 13px;border-radius:12px;cursor:pointer;white-space:nowrap}.balance svg{color:#ffc83d}.balance strong{color:#fff}
 .hero{max-width:1240px;margin:0 auto;padding:66px clamp(20px,5vw,60px) 46px;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:40px}
 .hero-copy{min-width:0}.eyebrow{display:inline-flex;align-items:center;gap:7px;color:#ffc83d;font-size:11px;font-weight:900;letter-spacing:.16em}
@@ -32,6 +32,7 @@ button,a{font:inherit}
   .how{padding:0 28px}.steps{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:800px){
+  .brand-logo{width:52px;height:52px}
   .app-shell{padding-bottom:84px}
   .topbar{height:64px;padding:0 14px;position:sticky}
   .brand{position:absolute;left:50%;transform:translateX(-50%);font-size:17px;gap:7px}.brand-logo{width:42px;height:42px}
