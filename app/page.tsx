@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Gamepad2, WalletCards, ChevronRight, Coins, Clock3, ShieldCheck, Sparkles, LoaderCircle, ListChecks } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import BottomNav from "./components/BottomNav";
 
 type PlayOffer = { id:string; title:string; description:string; category:string; icon:string; landingPage:string; tasks:{name:string;reward:number|null}[]; daysLeft:number|null };
 
@@ -17,6 +18,6 @@ export default function HomePage(){
     <section className="simple-section"><div className="simple-head"><div><span className="eyebrow">RECOMENDADO</span><h2>Ofertas para ti</h2></div><Link href="/games">Ver todas <ChevronRight size={15}/></Link></div>{loading?<div className="simple-empty"><LoaderCircle className="spin" size={22}/><span>Cargando...</span></div>:offers.length?<div className="offer-row">{offers.slice(0,2).map(o=><article className="simple-offer" key={o.id}><div className="simple-offer-top">{o.icon?<img src={o.icon} alt=""/>:<span>🎮</span>}<div><span className="tag">{o.category}</span><h3>{o.title}</h3></div></div><div className="offer-meta"><span><Clock3 size={14}/> {o.daysLeft!=null?o.daysLeft+" días":"Tiempo disponible"}</span><b>{o.tasks.length||1} objetivos</b></div><a className="offer-link" href={o.landingPage} target="_blank" rel="noreferrer">VER OFERTA <ChevronRight size={15}/></a></article>)}</div>:<div className="simple-empty"><strong>Pronto verás tus ofertas aquí</strong><span>Las campañas aparecerán cuando haya ofertas disponibles para tu cuenta.</span></div>}</section>
     <section className="simple-section"><div className="simple-head"><div><span className="eyebrow">TU PROGRESO</span><h2>Mis tareas</h2></div><Link href="/tasks">Ver mis tareas <ChevronRight size={15}/></Link></div><div className="continue-card"><div className="continue-icon"><ListChecks size={23}/></div><div><strong>Continúa donde quedaste</strong><p>Las ofertas que empieces aparecerán aquí con tus objetivos y progreso.</p></div><ChevronRight size={20}/></div></section>
     <section className="how-simple"><span className="eyebrow">MUY FÁCIL</span><h2>¿Cómo ganas?</h2><div className="mini-steps"><div><b>1</b><span>Elige</span></div><div><b>2</b><span>Juega</span></div><div><b>3</b><span>Completa</span></div><div><b>4</b><span>Retira</span></div></div><p><ShieldCheck size={15}/> Cada objetivo validado suma a tu saldo.</p></section>
-    <nav className="bottom-nav"><Link className="active" href="/">⌂<span>Inicio</span></Link><Link href="/games"><Gamepad2 size={20}/><span>Ganar</span></Link><Link href="/tasks"><ListChecks size={20}/><span>Mis tareas</span></Link><Link href="/wallet"><WalletCards size={20}/><span>Billetera</span></Link></nav>
+    <BottomNav />
   </main>;
 }
