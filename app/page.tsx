@@ -90,7 +90,7 @@ export default function HomePage() {
       <section className="quick-stats">
         <div><span>💰</span><b>Saldo</b><strong>${balance}</strong></div>
         <div><span>🎮</span><b>Jugando</b><strong>0 ofertas</strong></div>
-        <div><span>🎁</span><b>Ganado</b><strong>${balance}</strong></div>
+        <div><span>🎁</span><b>Ganado</b><strong>${(wallet.lifetime_earned / 1000).toFixed(2)}</strong></div>
       </section>
 
       <section className="section" id="ofertas">
