@@ -136,7 +136,7 @@ export default function HomePage() {
         <a className="active" href="/"><Home size={21} /><span>Inicio</span></a>
         <a href="#ofertas"><Gamepad2 size={21} /><span>Juegos</span></a>
         <a><Gift size={21} /><span>Premios</span></a>
-        <a><WalletCards size={21} /><span>Billetera</span></a>
+        <a href="/wallet"><WalletCards size={21} /><span>Billetera</span></a>
         <a><User size={21} /><span>Perfil</span></a>
       </nav>
     </main>
