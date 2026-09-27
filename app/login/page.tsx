@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
 const countries = [
@@ -15,7 +15,8 @@ const logoUrl = "https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/m
 export default function LoginPage() {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [fullName, setFullName] = useState(""), [birthDate, setBirthDate] = useState(""), [country, setCountry] = useState("NI");
-  const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState("");
+  const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
   const selectedCountry = useMemo(() => countries.find((item) => item.code === country) ?? countries[0], [country]);
   const fullPhone = () => selectedCountry.dial + phone.replace(/\D/g, "");
@@ -26,6 +27,7 @@ export default function LoginPage() {
     event.preventDefault(); setError(""); setMessage("");
     if (!email.trim() || !email.includes("@")) return setError("Escribe un correo electrónico válido.");
     if (password.length < 6) return setError("La contraseña debe tener al menos 6 caracteres.");
+    if (mode === "register" && password !== confirmPassword) return setError("Las contraseñas no coinciden.");
 
     if (mode === "register") {
       if (fullName.trim().length < 2) return setError("Escribe tu nombre completo.");
@@ -78,7 +80,22 @@ export default function LoginPage() {
             <label htmlFor="phone">Número de teléfono</label><div className="phone-field"><span>{selectedCountry.dial}</span><input id="phone" inputMode="numeric" autoComplete="tel" placeholder="8888 8888" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={loading} /></div>
           </>}
           <label htmlFor="email">Correo electrónico</label><input id="email" type="email" autoComplete="email" placeholder="tu@correo.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} />
-          <label htmlFor="password">Contraseña</label><input id="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} placeholder="Mínimo 6 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} />
+          <label htmlFor="password">Contraseña</label>
+          <div className="password-field">
+            <input id="password" type={showPassword ? "text" : "password"} autoComplete={mode === "login" ? "current-password" : "new-password"} placeholder="Mínimo 6 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} />
+            <button type="button" className="password-toggle" aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"} onClick={() => setShowPassword((value) => !value)} disabled={loading}>
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          {mode === "register" && <>
+            <label htmlFor="confirmPassword">Confirmar contraseña</label>
+            <div className="password-field">
+              <input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} autoComplete="new-password" placeholder="Repite tu contraseña" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={loading} />
+              <button type="button" className="password-toggle" aria-label={showConfirmPassword ? "Ocultar confirmación de contraseña" : "Mostrar confirmación de contraseña"} onClick={() => setShowConfirmPassword((value) => !value)} disabled={loading}>
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </>}
           <button className="auth-button" type="submit" disabled={loading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : "CREAR CUENTA"}</button>
         </form>
         {message && <div className="auth-message success"><CheckCircle2 size={18} /> {message}</div>}
