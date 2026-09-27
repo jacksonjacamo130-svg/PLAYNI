@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, WalletCards, Coins, CreditCard, ShieldCheck, Clock3, ChevronRight, LoaderCircle } from "lucide-react";
+import { WalletCards, Coins, CreditCard, ShieldCheck, Clock3, ChevronRight, LoaderCircle } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import BottomNav from "../components/BottomNav";
 
@@ -60,10 +60,11 @@ export default function WalletPage() {
 
   return (
     <main className="app-shell wallet-page">
-      <header className="topbar">
-        <a className="back-link" href="/"><ArrowLeft size={19} /></a>
-        <div className="brand"><WalletCards size={25} /><span>BILLETERA</span></div>
-        <div className="wallet-mini">BILLETERA</div>
+      <header className="topbar inner-page-topbar">
+        <a className="brand" href="/">
+          <img className="brand-logo" src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI"/>
+        </a>
+        <div className="page-title"><WalletCards size={20} /><span>BILLETERA</span></div>
       </header>
 
       <section className="wallet-hero">
@@ -103,6 +104,7 @@ export default function WalletPage() {
           </div>
         )}
       </section>
+      <BottomNav />
     </main>
   );
 }
