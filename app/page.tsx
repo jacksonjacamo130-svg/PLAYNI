@@ -2,14 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Coins, ChevronRight, Clock3, LoaderCircle, Search, ShieldCheck, Sparkles,  Gamepad2 } from "lucide-react";
+import { Coins, ChevronRight, Clock3, LoaderCircle, Search, ShieldCheck, Sparkles, Gamepad2 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import BottomNav from "./components/BottomNav";
+import StartOfferButton from "./components/StartOfferButton";
 
-type PlayOffer = { id:string; title:string; description:string; category:string; icon:string; landingPage:string; tasks:{name:string;reward:number|null}[]; daysLeft:number|null };
+type PlayOffer = {
+  id:string; title:string; description:string; category:string; icon:string;
+  landingPage:string; platform?:string; tasks:{id?:string|null;name:string;reward:number|null}[];
+  daysLeft:number|null;
+};
 
 export default function HomePage(){
-  const [name,setName]=useState("Jugador"), [balance,setBalance]=useState("0.00"), [offers,setOffers]=useState<PlayOffer[]>([]), [loading,setLoading]=useState(true), [query,setQuery]=useState("");
+  const [name,setName]=useState("Jugador"), [balance,setBalance]=useState("0.00"),
+    [offers,setOffers]=useState<PlayOffer[]>([]), [loading,setLoading]=useState(true), [query,setQuery]=useState("");
 
   useEffect(()=>{(async()=>{
     const {data:{session}}=await supabase.auth.getSession();
@@ -37,7 +43,6 @@ export default function HomePage(){
       </Link>
       <div className="discover-actions">
         <Link className="balance account-balance" href="/wallet"><Coins size={16}/><strong>{"$"+balance}</strong><ChevronRight size={14}/></Link>
-        
       </div>
     </header>
 
@@ -78,7 +83,20 @@ export default function HomePage(){
           </div>
           <p>{o.description||"Completa objetivos dentro del juego para recibir recompensas."}</p>
           <div className="discover-meta"><span><Clock3 size={14}/>{o.daysLeft!=null?o.daysLeft+" días":"Tiempo limitado"}</span><span>{o.tasks.length||1} objetivos</span></div>
-          <a className="discover-cta" href={o.landingPage} target="_blank" rel="noreferrer">VER OFERTA <ChevronRight size={17}/></a>
+          <StartOfferButton
+            offerId={o.id}
+            title={o.title}
+            description={o.description}
+            iconUrl={o.icon}
+            landingUrl={o.landingPage}
+            category={o.category}
+            platform={o.platform}
+            rewardCoins={o.tasks.reduce((a,t)=>a+(t.reward??0),0)}
+            daysLeft={o.daysLeft}
+            tasks={o.tasks}
+            className="discover-cta"
+            label="EMPEZAR A JUGAR"
+          />
         </div>
       </article>)}</div> :
       <div className="no-real-offers discover-empty">
