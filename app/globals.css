@@ -380,3 +380,25 @@ button,a{font:inherit}
   border: 0 !important;
   background-image: none !important;
 }
+
+
+/* PLAYNI — NOTIFICATIONS ACTION IS A BUTTON, NOT A LINK */
+.profile-notifications-link{
+  width:100% !important;
+  margin:0 !important;
+  padding:13px 16px !important;
+  font:inherit !important;
+  text-align:left !important;
+  cursor:pointer !important;
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  -webkit-tap-highlight-color:transparent !important;
+}
+.profile-notifications-link:focus,
+.profile-notifications-link:focus-visible,
+.profile-notifications-link:active{
+  outline:none !important;
+  box-shadow:none !important;
+  border:0 !important;
+  background:transparent !important;
+}
