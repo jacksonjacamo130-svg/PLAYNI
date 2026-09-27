@@ -4,7 +4,7 @@ body{min-height:100vh}
 button,a{font:inherit}
 .app-shell{min-height:100vh;padding-bottom:92px;width:100%;overflow-x:hidden}
 .topbar{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,5vw,72px);border-bottom:1px solid #202637;background:#0b0f1a;position:sticky;top:0;z-index:20}
-.brand{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:900;letter-spacing:.08em;min-width:0}.brand span{white-space:nowrap}.brand-mark{display:grid;place-items:center;width:35px;height:35px;border-radius:10px;background:#ffc83d;color:#111827}
+.brand{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:900;letter-spacing:.08em;min-width:0;text-decoration:none;color:inherit}.brand span{white-space:nowrap}.brand-mark{display:grid;place-items:center;width:35px;height:35px;border-radius:10px;background:#ffc83d;color:#111827}
 .brand-logo{width:42px;height:42px;object-fit:contain;display:block;flex:none}
 .balance{display:flex;align-items:center;gap:8px;border:1px solid #30384b;background:#151b2a;color:#d7d9e5;padding:9px 13px;border-radius:12px;cursor:pointer;white-space:nowrap}.balance svg{color:#ffc83d}.balance strong{color:#fff}
 .hero{max-width:1240px;margin:0 auto;padding:66px clamp(20px,5vw,60px) 46px;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:40px}
@@ -21,7 +21,7 @@ button,a{font:inherit}
 .game-info{padding:17px;min-width:0}.tag{font-size:10px;color:#aeb5c6;text-transform:uppercase;letter-spacing:.12em}.game-info h3{font-size:19px;margin:7px 0 8px;overflow-wrap:anywhere}.game-info p{display:flex;align-items:center;gap:6px;color:#969eb0;font-size:12px;margin:0;overflow-wrap:anywhere}.game-info p svg{color:#ffc83d}.offer-days{display:block;color:#7f899c;font-size:10px;margin-top:7px}.offer-link{width:100%;margin-top:14px;padding:12px;border-radius:9px;background:#ffc83d;color:#111827;text-decoration:none;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:4px}
 .offers-empty{grid-column:1/-1;border:1px dashed #303a4f;border-radius:18px;background:#121927;padding:30px;text-align:center;color:#858da0;display:flex;flex-direction:column;gap:8px;line-height:1.5}.offers-empty strong{color:#fff;font-size:15px}
 .how{max-width:1120px;margin:78px auto 0;padding:0 24px}.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:25px}.steps div{border:1px solid #293246;background:#121927;border-radius:16px;padding:18px;min-height:145px}.steps span{color:#ffc83d;font-size:11px;font-weight:900}.steps h3{margin:12px 0 6px}.steps p{color:#838b9e;font-size:12px;margin:0;line-height:1.5}
-.daily{max-width:1120px;margin:55px auto 0;padding:18px 22px;display:flex;align-items:center;gap:15px;border:1px solid #293246;background:#151c2b;border-radius:18px}.daily-icon{font-size:27px}.daily p{margin:4px 0 0;color:#8e96a9;font-size:12px}.daily button{margin-left:auto;background:#ffc83d;color:#111827;padding:11px 15px;border-radius:9px;font-size:11px}
+.daily{max-width:1120px;margin:55px auto 0;padding:18px 22px;display:flex;align-items:center;gap:15px;border:1px solid #293246;background:#151c2b;border-radius:18px}.daily-icon{font-size:27px}.daily p{margin:4px 0 0;color:#8e96a9;font-size:12px}.daily-button{margin-left:auto;background:#ffc83d;color:#111827;padding:11px 15px;border-radius:9px;font-size:11px;font-weight:900;text-decoration:none;white-space:nowrap}
 .bottom-nav{display:none}
 @media(max-width:1100px) and (min-width:801px){
   .hero{grid-template-columns:1fr .8fr;gap:24px;padding-top:48px}
@@ -33,8 +33,8 @@ button,a{font:inherit}
 }
 @media(max-width:800px){
   .app-shell{padding-bottom:84px}
-  .topbar{height:64px;padding:0 14px}
-  .brand{font-size:17px;gap:7px}.brand-logo{width:38px;height:38px}
+  .topbar{height:64px;padding:0 14px;position:sticky}
+  .brand{position:absolute;left:50%;transform:translateX(-50%);font-size:17px;gap:7px}.brand-logo{width:42px;height:42px}
   .balance{padding:8px 10px;font-size:11px;gap:6px}
   .balance strong{font-size:11px}
   .hero{padding:30px 18px 34px;grid-template-columns:1fr;gap:18px}
@@ -49,7 +49,7 @@ button,a{font:inherit}
   .section{padding:0 18px}.section-head{align-items:center;margin-bottom:18px}.section-head h2,.how-head h2{font-size:27px}.section-head a{font-size:11px}
   .game-grid{grid-template-columns:1fr;gap:12px}.game-cover{height:155px}.game-info{padding:15px}
   .how{margin-top:52px;padding:0 18px}.steps{grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.steps div{min-height:130px;padding:15px}.steps h3{font-size:15px}.steps p{font-size:11px}
-  .daily{margin:42px 18px 0;padding:14px;gap:11px}.daily p{font-size:11px}.daily button{padding:10px 11px;flex:none}
+  .daily{margin:42px 18px 0;padding:14px;gap:11px}.daily p{font-size:11px}.daily-button{padding:10px 11px;flex:none}
   .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:70px;padding-bottom:env(safe-area-inset-bottom);box-sizing:content-box;background:#0f1521;border-top:1px solid #252e40;z-index:30;justify-content:space-around}
   .bottom-nav a{color:#788196;text-decoration:none;font-size:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;flex:1;padding:8px 2px}.bottom-nav a.active{color:#ffc83d}
   .welcome-bar{margin:14px 18px 0;padding:14px;gap:12px}.welcome-bar h2{font-size:20px}.welcome-bar p{font-size:11px}
@@ -59,12 +59,12 @@ button,a{font:inherit}
   .steps{grid-template-columns:1fr}
   .game-cover{height:150px}
   .section-head a{display:none}
-  .daily{align-items:flex-start}.daily-icon{font-size:24px}.daily button{font-size:10px}
+  .daily{align-items:flex-start}.daily-icon{font-size:24px}.daily-button{font-size:10px}
   .brand span{display:none}
   .balance strong{font-size:10px}
 }
 @media(max-width:360px){
-  .topbar{padding:0 10px}.brand-logo{width:34px;height:34px}.balance{padding:7px 8px}
+  .topbar{padding:0 10px}.brand-logo{width:38px;height:38px}.balance{padding:7px 8px}
   .hero{padding-left:14px;padding-right:14px}.section{padding-left:14px;padding-right:14px}.quick-stats{margin-left:14px;margin-right:14px}.how{padding-left:14px;padding-right:14px}.daily{margin-left:14px;margin-right:14px}
   .hero h1{font-size:37px}.daily p{max-width:145px}
 }
