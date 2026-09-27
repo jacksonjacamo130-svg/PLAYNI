@@ -276,26 +276,8 @@ button,a{font:inherit}
 
 
 
-/* PLAYNI — FINAL HEADER SIZE */
-.topbar,.discover-topbar,.inner-page-topbar{
-  height:72px!important;
-  min-height:72px!important;
-  padding:0 16px!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:space-between!important;
-}
-.topbar .brand,.discover-topbar .brand,.inner-page-topbar .brand{
-  position:static!important;
-  left:auto!important;
-  transform:none!important;
-  height:72px!important;
-  min-height:72px!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:flex-start!important;
-  text-decoration:none!important;
-}
+
+/* PLAYNI — LOGO VISUAL SIZE */
 .topbar .brand-logo,.discover-topbar .brand-logo,.inner-page-topbar .brand-logo,.brand-logo-hero{
   width:68px!important;
   height:68px!important;
@@ -303,35 +285,12 @@ button,a{font:inherit}
   min-height:68px!important;
   max-width:68px!important;
   max-height:68px!important;
-  margin:0!important;
-  padding:0!important;
   object-fit:contain!important;
   display:block!important;
-  transform:none!important;
+  transform:scale(1.38)!important;
+  transform-origin:center!important;
 }
-.profile-menu-row,
-.profile-menu-row:hover,
-.profile-menu-row:visited,
-.profile-menu-row:active,
-.profile-menu-row:focus{
-  color:inherit!important;
-  text-decoration:none!important;
-  text-decoration-line:none!important;
-  text-decoration-thickness:0!important;
-  text-decoration-color:transparent!important;
-}
-.profile-menu-row *{text-decoration:none!important;text-decoration-line:none!important}
-.profile-menu-row strong{color:#f5f7fb!important}
 @media(max-width:800px){
-  .topbar,.discover-topbar,.inner-page-topbar{
-    height:68px!important;
-    min-height:68px!important;
-    padding:0 14px!important;
-  }
-  .topbar .brand,.discover-topbar .brand,.inner-page-topbar .brand{
-    height:68px!important;
-    min-height:68px!important;
-  }
   .topbar .brand-logo,.discover-topbar .brand-logo,.inner-page-topbar .brand-logo,.brand-logo-hero{
     width:60px!important;
     height:60px!important;
@@ -339,15 +298,14 @@ button,a{font:inherit}
     min-height:60px!important;
     max-width:60px!important;
     max-height:60px!important;
+    transform:scale(1.38)!important;
   }
 }
 @media(max-width:360px){
   .topbar .brand-logo,.discover-topbar .brand-logo,.inner-page-topbar .brand-logo,.brand-logo-hero{
-    width:58px!important;
-    height:58px!important;
-    min-width:58px!important;
-    min-height:58px!important;
-    max-width:58px!important;
-    max-height:58px!important;
+    width:58px!important;height:58px!important;
+    min-width:58px!important;min-height:58px!important;
+    max-width:58px!important;max-height:58px!important;
+    transform:scale(1.38)!important;
   }
 }
