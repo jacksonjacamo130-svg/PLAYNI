@@ -1,11 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-
-if (!supabaseUrl || !supabasePublishableKey) {
-  throw new Error("Faltan NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.");
-}
+const supabaseUrl = "https://ftcmijoklkmyrqqqlabs.supabase.co";
+const supabasePublishableKey = "sb_publishable_SqM8MLVo76vprAalGIq4_w_Oyj52mn7";
 
 export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: {
