@@ -22,6 +22,13 @@ type Props = {
   label?: string;
 };
 
+function downloadLabel(url: string, platform?: string) {
+  const value = (url + " " + (platform ?? "")).toLowerCase();
+  if (value.includes("play.google.com") || value.includes("android")) return "DESCARGAR EN GOOGLE PLAY";
+  if (value.includes("apps.apple.com") || value.includes("itunes.apple.com") || value.includes("ios")) return "DESCARGAR EN APP STORE";
+  return "ABRIR OFERTA";
+}
+
 export default function StartOfferButton({
   provider = "ayet",
   offerId,
@@ -75,16 +82,18 @@ export default function StartOfferButton({
         throw new Error("start_failed");
       }
 
-      window.location.href = landingUrl;
+      window.location.assign(landingUrl);
     } catch {
       setStarting(false);
       window.alert("No pudimos registrar esta oferta. Inténtalo de nuevo.");
     }
   }
 
+  const buttonLabel = label === "EMPEZAR A JUGAR" ? downloadLabel(landingUrl, platform) : label;
+
   return (
     <button type="button" className={className} onClick={startOffer} disabled={starting}>
-      {starting ? <><LoaderCircle size={17} className="spin" /> INICIANDO...</> : <>{label} <ChevronRight size={17} /></>}
+      {starting ? <><LoaderCircle size={17} className="spin" /> INICIANDO...</> : <>{buttonLabel} <ChevronRight size={17} /></>}
     </button>
   );
 }
