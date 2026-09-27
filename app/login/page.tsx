@@ -14,7 +14,7 @@ const logoUrl = "https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/m
 
 export default function LoginPage() {
   const [mode, setMode] = useState<"login" | "register">("login");
-  const [fullName, setFullName] = useState(""), [birthDate, setBirthDate] = useState(""), [country, setCountry] = useState("NI");
+  const [fullName, setFullName] = useState(""), [birthDate, setBirthDate] = useState(""), [gender, setGender] = useState(""), [country, setCountry] = useState("NI");
   const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
@@ -32,6 +32,7 @@ export default function LoginPage() {
     if (mode === "register") {
       if (fullName.trim().length < 2) return setError("Escribe tu nombre completo.");
       if (!birthDate) return setError("Selecciona tu fecha de nacimiento.");
+      if (!gender) return setError("Selecciona tu género.");
       const today = new Date(), birth = new Date(birthDate + "T00:00:00");
       let age = today.getFullYear() - birth.getFullYear();
       const monthDiff = today.getMonth() - birth.getMonth();
@@ -51,7 +52,7 @@ export default function LoginPage() {
 
     const { data, error: signUpError } = await supabase.auth.signUp({
       email: email.trim(), password,
-      options: { emailRedirectTo: window.location.origin + "/login?confirmed=1", data: { full_name: fullName.trim(), birth_date: birthDate, country_code: selectedCountry.code, phone_e164: fullPhone(), phone_verified: false } }
+      options: { emailRedirectTo: window.location.origin + "/login?confirmed=1", data: { full_name: fullName.trim(), birth_date: birthDate, gender, country_code: selectedCountry.code, phone_e164: fullPhone(), phone_verified: false } }
     });
     setLoading(false);
     if (signUpError) return setError(signUpError.message);
@@ -76,6 +77,12 @@ export default function LoginPage() {
           {mode === "register" && <>
             <label htmlFor="fullName">Nombre completo</label><input id="fullName" autoComplete="name" placeholder="Tu nombre completo" value={fullName} onChange={(e) => setFullName(e.target.value)} disabled={loading} />
             <label htmlFor="birthDate">Fecha de nacimiento</label><input id="birthDate" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} disabled={loading} />
+            <label htmlFor="gender">Género</label><select id="gender" value={gender} onChange={(e) => setGender(e.target.value)} disabled={loading}>
+              <option value="">Selecciona una opción</option>
+              <option value="male">Hombre</option>
+              <option value="female">Mujer</option>
+              <option value="other">Otro</option>
+            </select>
             <label htmlFor="country">País</label><select id="country" value={country} onChange={(e) => setCountry(e.target.value)} disabled={loading}>{countries.map((item) => <option key={item.code} value={item.code}>{item.name} ({item.dial})</option>)}</select>
             <label htmlFor="phone">Número de teléfono</label><div className="phone-field"><span>{selectedCountry.dial}</span><input id="phone" inputMode="numeric" autoComplete="tel" placeholder="8888 8888" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={loading} /></div>
           </>}
