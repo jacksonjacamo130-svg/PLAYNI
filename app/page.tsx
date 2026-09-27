@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Gamepad2, Gift, Home, User, WalletCards, ChevronRight, Coins, Clock3, ShieldCheck, Sparkles, LoaderCircle } from "lucide-react";
 import { supabase } from "../lib/supabase";
 
@@ -53,13 +54,13 @@ export default function HomePage() {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <a className="brand" href="/" aria-label="PLAYNI inicio">
+        <Link className="brand" href="/" aria-label="PLAYNI inicio">
           <img className="brand-logo" src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI" />
-        </a>
+        </Link>
         {loading ? (
   <div className="balance"><LoaderCircle size={16} className="spin" /></div>
 ) : profile ? (
-  <a className="balance account-balance" href="/wallet" aria-label="Abrir billetera"><Coins size={17} /><strong>${balance}</strong><ChevronRight size={14} /></a>
+  <Link className="balance account-balance" href="/wallet" aria-label="Abrir billetera"><Coins size={17} /><strong>${balance}</strong><ChevronRight size={14} /></Link>
 ) : (
   <a className="balance" href="/login" aria-label="Iniciar sesión"><Coins size={17} /><strong>INICIAR SESIÓN</strong></a>
 )}
@@ -73,7 +74,7 @@ export default function HomePage() {
           <h1>Tu próxima<br /><span>recompensa</span><br />empieza aquí.</h1>
           <p>Elige un juego, completa objetivos y mira cómo tus ganancias aumentan paso a paso.</p>
           <div className="hero-actions">
-            <a className="primary-btn" href={profile ? "#ofertas" : "/login"}>{profile ? "VER OFERTAS" : "EMPEZAR A GANAR"} <ChevronRight size={18} /></a>
+            <Link className="primary-btn" href={profile ? "/games" : "/login"}>{profile ? "VER OFERTAS" : "EMPEZAR A GANAR"} <ChevronRight size={18} /></Link>
             <span className="trust"><ShieldCheck size={15} /> Sin costo para empezar</span>
           </div>
         </div>
@@ -98,7 +99,7 @@ export default function HomePage() {
       <section className="section" id="ofertas">
         <div className="section-head">
           <div><span className="eyebrow">PARA TI</span><h2>Empieza a ganar</h2></div>
-          <a href="#ofertas">Ver todas <ChevronRight size={16} /></a>
+          <Link href="/games">Ver todas <ChevronRight size={16} /></Link>
         </div>
         <div className="game-grid">
           {offersLoading ? (
@@ -141,7 +142,7 @@ export default function HomePage() {
       <section className="daily" id="bono">
         <div className="daily-icon">🎁</div>
         <div><strong>Bono diario</strong><p>Vuelve cada día para descubrir nuevas oportunidades.</p></div>
-        <a className="daily-button" href="#ofertas">VER OFERTAS</a>
+        <Link className="daily-button" href="/games">VER OFERTAS</Link>
       </section>
 
       <nav className="bottom-nav">
