@@ -402,3 +402,46 @@ button,a{font:inherit}
   border:0 !important;
   background:transparent !important;
 }
+
+
+/* PLAYNI — ACTIVE GAMES HOME ACCESS */
+.active-games-banner{
+  max-width:1180px;
+  margin:0 auto 4px;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  border:1px solid #30394d;
+  border-radius:15px;
+  background:#121927;
+}
+.active-games-icon{
+  width:40px;height:40px;flex:none;
+  display:grid;place-items:center;
+  border-radius:11px;
+  background:#1b2538;
+  color:#ffc83d;
+}
+.active-games-copy{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}
+.active-games-copy strong{font-size:13px;color:#f5f7fb}
+.active-games-copy span{font-size:10px;color:#7f899c}
+.active-games-link{
+  display:flex;align-items:center;gap:3px;
+  white-space:nowrap;
+  color:#ffc83d;
+  text-decoration:none;
+  font-size:10px;
+  font-weight:900;
+}
+@media(max-width:800px){
+  .active-games-banner{margin:0 18px 2px;padding:12px}
+  .active-games-link{font-size:9px}
+}
+@media(max-width:480px){
+  .active-games-banner{margin-left:16px;margin-right:16px}
+  .active-games-copy strong{font-size:12px}
+  .active-games-copy span{font-size:9px}
+  .active-games-link{font-size:0}
+  .active-games-link svg{width:18px;height:18px}
+}
