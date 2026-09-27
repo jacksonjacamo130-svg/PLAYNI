@@ -51,7 +51,7 @@ export default function LoginPage() {
 
     const { data, error: signUpError } = await supabase.auth.signUp({
       email: email.trim(), password,
-      options: { data: { full_name: fullName.trim(), birth_date: birthDate, country_code: selectedCountry.code, phone_e164: fullPhone(), phone_verified: false } }
+      options: { emailRedirectTo: window.location.origin + "/login?confirmed=1", data: { full_name: fullName.trim(), birth_date: birthDate, country_code: selectedCountry.code, phone_e164: fullPhone(), phone_verified: false } }
     });
     setLoading(false);
     if (signUpError) return setError(signUpError.message);
