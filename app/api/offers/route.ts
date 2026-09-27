@@ -19,16 +19,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ configured: false, offers: [], error: "INVALID_SESSION" }, { status: 401 });
   }
 
-  const apiKey = process.env.AYET_PUBLISHER_API_KEY;
-  const adslotId = process.env.AYET_ADSLOT_ID;
-  if (!apiKey || !adslotId) {
-    return NextResponse.json({
-      configured: false,
-      provider: "ayet",
-      offers: [],
-      message: "El proveedor de ofertas todavía no está configurado."
-    });
-  }
+  // PLAYNI WEB → Offerwall API adslot 29888.
+  // Offerwall API does not require exposing the publisher API key to the client.
+  const adslotId = "29888";
 
   const params = new URLSearchParams({
     external_identifier: user.id,
@@ -36,8 +29,8 @@ export async function GET(request: NextRequest) {
     ip: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "",
     language: "es",
     num_offers: "30",
-    offer_sorting: "payout",
-    apiKey
+    offer_sorting: "ecpm",
+    minimum_payout: "0"
   });
 
   const response = await fetch(
