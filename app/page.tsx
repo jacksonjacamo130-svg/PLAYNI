@@ -1,5 +1,8 @@
-import Image from "next/image";
-import { Gamepad2, Gift, Home, User, WalletCards, Flame, ChevronRight, Coins, Clock3, ShieldCheck, Sparkles } from "lucide-react";
+"use client";
+
+import { useEffect, useState } from "react";
+import { Gamepad2, Gift, Home, User, WalletCards, ChevronRight, Coins, Clock3, ShieldCheck, Sparkles, LogOut, LoaderCircle } from "lucide-react";
+import { supabase } from "../lib/supabase";
 
 const offers = [
   { title: "MONOPOLY GO!", category: "Tablero", reward: "$12.40", goal: "Alcanza el nivel 10", icon: "🎲" },
@@ -11,15 +14,56 @@ const offers = [
 ];
 
 export default function HomePage() {
+  const [profile, setProfile] = useState<{full_name: string | null; display_name: string | null; country_code: string; phone_verified: boolean} | null>(null);
+  const [wallet, setWallet] = useState<{coins: number; lifetime_earned: number}>({ coins: 0, lifetime_earned: 0 });
+  const [loading, setLoading] = useState(true);
+  const [signingOut, setSigningOut] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadAccount() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { if (mounted) setLoading(false); return; }
+      const [{ data: profileData }, { data: walletData }] = await Promise.all([
+        supabase.from("profiles").select("full_name,display_name,country_code,phone_verified").eq("id", user.id).maybeSingle(),
+        supabase.from("wallets").select("coins,lifetime_earned").eq("user_id", user.id).maybeSingle()
+      ]);
+      if (mounted) {
+        setProfile(profileData);
+        setWallet(walletData ?? { coins: 0, lifetime_earned: 0 });
+        setLoading(false);
+      }
+    }
+    loadAccount();
+    return () => { mounted = false; };
+  }, []);
+
+  async function signOut() {
+    setSigningOut(true);
+    await supabase.auth.signOut({ scope: "local" });
+    window.location.href = "/";
+  }
+
+  const firstName = profile?.full_name?.trim().split(" ")[0] || profile?.display_name || "Jugador";
+  const balance = (wallet.coins / 1000).toFixed(2);
+
   return (
     <main className="app-shell">
       <header className="topbar">
         <div className="brand">
-          <Image src="/logo-playni.png" alt="PLAYNI" width={42} height={42} priority />
+          <img src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI" width={42} height={42} />
           <span>PLAYNI</span>
         </div>
-        <a className="balance" href="/login" aria-label="Iniciar sesión"><Coins size={17} /><strong>INICIAR SESIÓN</strong></a>
+        {loading ? (
+  <div className="balance"><LoaderCircle size={16} className="spin" /></div>
+) : profile ? (
+  <button className="balance account-balance" onClick={signOut} disabled={signingOut}><Coins size={17} /><strong>${balance}</strong><LogOut size={14} /></button>
+) : (
+  <a className="balance" href="/login" aria-label="Iniciar sesión"><Coins size={17} /><strong>INICIAR SESIÓN</strong></a>
+)}
       </header>
+
+      {profile && <section className="welcome-bar"><div><span className="eyebrow">TU CUENTA</span><h2>Hola, {firstName} 👋</h2><p>Tu saldo y tus ganancias se actualizan desde tu cuenta PLAYNI.</p></div><div className="verified-pill">✓ TELÉFONO VERIFICADO</div></section>}
 
       <section className="hero">
         <div className="hero-copy">
@@ -27,7 +71,7 @@ export default function HomePage() {
           <h1>Tu próxima<br /><span>recompensa</span><br />empieza aquí.</h1>
           <p>Elige un juego, completa objetivos y mira cómo tus ganancias aumentan paso a paso.</p>
           <div className="hero-actions">
-            <a className="primary-btn" href="/login">EMPEZAR A GANAR <ChevronRight size={18} /></a>
+            <a className="primary-btn" href={profile ? "#ofertas" : "/login"}>{profile ? "VER OFERTAS" : "EMPEZAR A GANAR" <ChevronRight size={18} /></a>
             <span className="trust"><ShieldCheck size={15} /> Sin costo para empezar</span>
           </div>
         </div>
@@ -35,7 +79,7 @@ export default function HomePage() {
           <div className="hero-glow" />
           <div className="phone">
             <div className="phone-top"><span>PLAYNI</span><Coins size={15} /></div>
-            <div className="phone-balance">$0.00</div>
+            <div className="phone-balance">${balance}</div>
             <div className="phone-card"><span>🎮</span><div><b>Juega y gana</b><small>Completa objetivos</small></div></div>
             <div className="phone-card"><span>🟡</span><div><b>Recompensas</b><small>Retira cuando cumplas</small></div></div>
           </div>
@@ -44,12 +88,12 @@ export default function HomePage() {
       </section>
 
       <section className="quick-stats">
-        <div><span>💰</span><b>Saldo</b><strong>$0.00</strong></div>
+        <div><span>💰</span><b>Saldo</b><strong>${balance}</strong></div>
         <div><span>🎮</span><b>Jugando</b><strong>0 ofertas</strong></div>
-        <div><span>🎁</span><b>Ganado</b><strong>$0.00</strong></div>
+        <div><span>🎁</span><b>Ganado</b><strong>${balance}</strong></div>
       </section>
 
-      <section className="section">
+      <section className="section" id="ofertas">
         <div className="section-head">
           <div><span className="eyebrow">PARA TI</span><h2>Empieza a ganar</h2></div>
           <a href="#">Ver todas <ChevronRight size={16} /></a>
@@ -89,8 +133,8 @@ export default function HomePage() {
       </section>
 
       <nav className="bottom-nav">
-        <a className="active"><Home size={21} /><span>Inicio</span></a>
-        <a><Gamepad2 size={21} /><span>Juegos</span></a>
+        <a className="active" href="/"><Home size={21} /><span>Inicio</span></a>
+        <a href="#ofertas"><Gamepad2 size={21} /><span>Juegos</span></a>
         <a><Gift size={21} /><span>Premios</span></a>
         <a><WalletCards size={21} /><span>Billetera</span></a>
         <a><User size={21} /><span>Perfil</span></a>
