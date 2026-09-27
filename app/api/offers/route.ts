@@ -36,12 +36,13 @@ export async function GET(request: NextRequest) {
     ip: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "",
     language: "es",
     num_offers: "30",
-    offer_sorting: "payout"
+    offer_sorting: "payout",
+    apiKey
   });
 
   const response = await fetch(
     `https://www.ayetstudios.com/offers/offerwall_api/${encodeURIComponent(adslotId)}?${params.toString()}`,
-    { headers: { "X-Api-Key": apiKey }, cache: "no-store" }
+    { cache: "no-store" }
   );
 
   if (!response.ok) {
