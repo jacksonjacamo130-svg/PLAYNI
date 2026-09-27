@@ -25,7 +25,9 @@ export default function HomePage() {
   const [profile, setProfile] = useState<{full_name: string | null; display_name: string | null; country_code: string; phone_verified: boolean} | null>(null);
   const [wallet, setWallet] = useState<{coins: number; lifetime_earned: number}>({ coins: 0, lifetime_earned: 0 });
   const [loading, setLoading] = useState(true);
-  const [signingOut, setSigningOut] = useState(false);\n  const [offers, setOffers] = useState<PlayOffer[]>([]);\n  const [offersLoading, setOffersLoading] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [offers, setOffers] = useState<PlayOffer[]>([]);
+  const [offersLoading, setOffersLoading] = useState(false);
 
   useEffect(() => {
     let mounted = true;
