@@ -313,3 +313,36 @@ button,a{font:inherit}
 /* PLAYNI — REMOVE PROFILE LINK UNDERLINE */
 .profile-menu-row,.profile-menu-row:visited,.profile-menu-row:hover,.profile-menu-row:focus,.profile-menu-row:active{ text-decoration:none!important; }
 .profile-menu-row strong,.profile-menu-row span,.profile-menu-row em{ text-decoration:none!important; }
+
+
+/* PLAYNI — DEFINITIVE REMOVE NOTIFICATIONS LINE */
+.profile-page .profile-menu-card .profile-menu-row,
+.profile-page .profile-menu-card .profile-menu-row:link,
+.profile-page .profile-menu-card .profile-menu-row:visited,
+.profile-page .profile-menu-card .profile-menu-row:hover,
+.profile-page .profile-menu-card .profile-menu-row:focus,
+.profile-page .profile-menu-card .profile-menu-row:active{
+  text-decoration:none!important;
+  -webkit-text-decoration:none!important;
+  border-bottom:0!important;
+  border-top:0!important;
+  box-shadow:none!important;
+  background-image:none!important;
+  outline:none!important;
+}
+.profile-page .profile-menu-card .profile-menu-row::before,
+.profile-page .profile-menu-card .profile-menu-row::after{
+  display:none!important;
+  content:none!important;
+  border:0!important;
+  background:none!important;
+}
+.profile-page .profile-menu-card .profile-menu-row strong,
+.profile-page .profile-menu-card .profile-menu-row span,
+.profile-page .profile-menu-card .profile-menu-row em{
+  text-decoration:none!important;
+  -webkit-text-decoration:none!important;
+  border:0!important;
+  box-shadow:none!important;
+  background-image:none!important;
+}
