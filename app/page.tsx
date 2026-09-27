@@ -62,7 +62,7 @@ export default function HomePage() {
 ) : profile ? (
   <Link className="balance account-balance" href="/wallet" aria-label="Abrir billetera"><Coins size={17} /><strong>${balance}</strong><ChevronRight size={14} /></Link>
 ) : (
-  <a className="balance" href="/login" aria-label="Iniciar sesión"><Coins size={17} /><strong>INICIAR SESIÓN</strong></a>
+  <Link className="balance" href="/login" aria-label="Iniciar sesión"><Coins size={17} /><strong>INICIAR SESIÓN</strong></Link>
 )}
       </header>
 
@@ -145,13 +145,7 @@ export default function HomePage() {
         <Link className="daily-button" href="/games">VER OFERTAS</Link>
       </section>
 
-      <nav className="bottom-nav">
-        <a className="active" href="/"><Home size={21} /><span>Inicio</span></a>
-        <a href="#ofertas"><Gamepad2 size={21} /><span>Juegos</span></a>
-        <a href="#bono"><Gift size={21} /><span>Premios</span></a>
-        <a href="/wallet"><WalletCards size={21} /><span>Billetera</span></a>
-        <a href={profile ? "#cuenta" : "/login"}><User size={21} /><span>Perfil</span></a>
-      </nav>
+      <nav className="bottom-nav"><Link className="active" href="/"><Home size={21} /><span>Inicio</span></Link><Link href="/games"><Gamepad2 size={21} /><span>Juegos</span></Link><Link href="/rewards"><Gift size={21} /><span>Premios</span></Link><Link href="/wallet"><WalletCards size={21} /><span>Billetera</span></Link><Link href="/profile"><User size={21} /><span>Perfil</span></Link></nav>
     </main>
   );
 }
