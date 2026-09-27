@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft, WalletCards, Coins, CreditCard, ShieldCheck, Clock3, ChevronRight, LoaderCircle } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import BottomNav from "../components/BottomNav";
 
 type Wallet = { coins: number; lifetime_earned: number };
 type Transaction = { id: string; type: string; amount_coins: number; status: string; description: string | null; created_at: string };
