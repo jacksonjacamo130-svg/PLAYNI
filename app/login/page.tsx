@@ -5,212 +5,87 @@ import { ArrowLeft, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
 const countries = [
-  { code: "NI", name: "Nicaragua", dial: "+505" },
-  { code: "CR", name: "Costa Rica", dial: "+506" },
-  { code: "HN", name: "Honduras", dial: "+504" },
-  { code: "SV", name: "El Salvador", dial: "+503" },
-  { code: "GT", name: "Guatemala", dial: "+502" },
-  { code: "PA", name: "Panamá", dial: "+507" },
-  { code: "MX", name: "México", dial: "+52" },
-  { code: "US", name: "Estados Unidos", dial: "+1" }
+  { code: "NI", name: "Nicaragua", dial: "+505" }, { code: "CR", name: "Costa Rica", dial: "+506" },
+  { code: "HN", name: "Honduras", dial: "+504" }, { code: "SV", name: "El Salvador", dial: "+503" },
+  { code: "GT", name: "Guatemala", dial: "+502" }, { code: "PA", name: "Panamá", dial: "+507" },
+  { code: "MX", name: "México", dial: "+52" }, { code: "US", name: "Estados Unidos", dial: "+1" }
 ];
-
 const logoUrl = "https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png";
 
 export default function LoginPage() {
-  const [fullName, setFullName] = useState("");
-  const [birthDate, setBirthDate] = useState("");
-  const [country, setCountry] = useState("NI");
-  const [phone, setPhone] = useState("");
-  const [code, setCode] = useState("");
-  const [step, setStep] = useState<"phone" | "code">("phone");
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [mode, setMode] = useState<"login" | "register">("login");
+  const [fullName, setFullName] = useState(""), [birthDate, setBirthDate] = useState(""), [country, setCountry] = useState("NI");
+  const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
+  const selectedCountry = useMemo(() => countries.find((item) => item.code === country) ?? countries[0], [country]);
+  const fullPhone = () => selectedCountry.dial + phone.replace(/\D/g, "");
 
-  const selectedCountry = useMemo(
-    () => countries.find((item) => item.code === country) ?? countries[0],
-    [country]
-  );
+  function switchMode(next: "login" | "register") { setMode(next); setError(""); setMessage(""); }
 
-  function fullPhone() {
-    return `${selectedCountry.dial}${phone.replace(/\D/g, "")}`;
-  }
+  async function submit(event: FormEvent) {
+    event.preventDefault(); setError(""); setMessage("");
+    if (!email.trim() || !email.includes("@")) return setError("Escribe un correo electrónico válido.");
+    if (password.length < 6) return setError("La contraseña debe tener al menos 6 caracteres.");
 
-  async function sendCode(event: FormEvent) {
-    event.preventDefault();
-    setError("");
-    setMessage("");
-
-    const digits = phone.replace(/\D/g, "");
-    if (fullName.trim().length < 2) {
-      setError("Escribe tu nombre completo.");
-      return;
-    }
-    if (!birthDate) {
-      setError("Selecciona tu fecha de nacimiento.");
-      return;
-    }
-    const age = new Date().getFullYear() - new Date(birthDate).getFullYear() - (new Date() < new Date(new Date().getFullYear(), new Date(birthDate).getMonth(), new Date(birthDate).getDate()) ? 1 : 0);
-    if (age < 18) {
-      setError("Debes tener al menos 18 años para registrarte en PLAYNI.");
-      return;
-    }
-    if (digits.length < 7) {
-      setError("Escribe un número de teléfono válido.");
-      return;
+    if (mode === "register") {
+      if (fullName.trim().length < 2) return setError("Escribe tu nombre completo.");
+      if (!birthDate) return setError("Selecciona tu fecha de nacimiento.");
+      const today = new Date(), birth = new Date(birthDate + "T00:00:00");
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
+      if (age < 18) return setError("Debes tener al menos 18 años para registrarte en PLAYNI.");
+      if (phone.replace(/\D/g, "").length < 7) return setError("El teléfono es obligatorio para crear la cuenta.");
     }
 
     setLoading(true);
-    const { error: otpError } = await supabase.auth.signInWithOtp({
-      phone: fullPhone(),
-      options: {
-        data: {
-          country_code: selectedCountry.code,
-          full_name: fullName.trim(),
-          birth_date: birthDate
-        }
-      }
+    if (mode === "login") {
+      const { error: loginError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      setLoading(false);
+      if (loginError) return setError("Correo o contraseña incorrectos.");
+      window.location.href = "/";
+      return;
+    }
+
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email: email.trim(), password,
+      options: { data: { full_name: fullName.trim(), birth_date: birthDate, country_code: selectedCountry.code, phone_e164: fullPhone(), phone_verified: false } }
     });
     setLoading(false);
-
-    if (otpError) {
-      setError(otpError.message);
-      return;
-    }
-
-    setStep("code");
-    setMessage("Te enviamos un código de verificación por SMS.");
-  }
-
-  async function verifyCode(event: FormEvent) {
-    event.preventDefault();
-    setError("");
-    setMessage("");
-
-    if (!/^\d{6}$/.test(code)) {
-      setError("El código debe tener 6 dígitos.");
-      return;
-    }
-
-    setLoading(true);
-    const { error: verifyError } = await supabase.auth.verifyOtp({
-      phone: fullPhone(),
-      token: code,
-      type: "sms"
-    });
-    setLoading(false);
-
-    if (verifyError) {
-      setError("El código no es válido o ya expiró. Solicita uno nuevo.");
-      return;
-    }
-
-    window.location.href = "/";
+    if (signUpError) return setError(signUpError.message);
+    if (data.session) { window.location.href = "/"; return; }
+    setMessage("Cuenta creada. Revisa tu correo para confirmar la cuenta y después inicia sesión.");
+    setMode("login");
   }
 
   return (
     <main className="auth-page">
       <section className="auth-card">
-        <a className="auth-back" href="/">
-          <ArrowLeft size={18} /> Volver
-        </a>
-
-        <div className="auth-logo-wrap">
-          <img className="auth-logo" src={logoUrl} alt="PLAYNI" />
-        </div>
-
+        <a className="auth-back" href="/"><ArrowLeft size={18} /> Volver</a>
+        <div className="auth-logo-wrap"><img className="auth-logo" src={logoUrl} alt="PLAYNI" /></div>
         <div className="auth-heading">
           <span className="auth-kicker">PLAYNI</span>
-          <h1>{step === "phone" ? "Entra y empieza a ganar" : "Verifica tu número"}</h1>
-          <p>
-            {step === "phone"
-              ? "Regístrate con tu nombre, edad, país y número de teléfono. El número se verifica por SMS."
-              : `Escribe el código que enviamos a ${fullPhone()}.`}
-          </p>
+          <h1>{mode === "login" ? "Inicia sesión" : "Crea tu cuenta"}</h1>
+          <p>{mode === "login" ? "Entra con el correo y la contraseña de tu cuenta PLAYNI." : "Crea tu cuenta con correo y contraseña. El teléfono se solicita como requisito de seguridad."}</p>
         </div>
-
-        {step === "phone" ? (
-          <form onSubmit={sendCode} className="auth-form">
-            <label htmlFor="country">País</label>
-            <select
-              id="country"
-              value={country}
-              onChange={(event) => setCountry(event.target.value)}
-              disabled={loading}
-            >
-              {countries.map((item) => (
-                <option key={item.code} value={item.code}>
-                  {item.name} ({item.dial})
-                </option>
-              ))}
-            </select>
-
-            <label htmlFor="phone">Número de teléfono</label>
-            <div className="phone-field">
-              <span>{selectedCountry.dial}</span>
-              <input
-                id="phone"
-                inputMode="numeric"
-                autoComplete="tel"
-                placeholder="8888 8888"
-                value={phone}
-                onChange={(event) => setPhone(event.target.value)}
-                disabled={loading}
-              />
-            </div>
-
-            <button className="auth-button" type="submit" disabled={loading}>
-              {loading ? <Loader2 className="spin" size={19} /> : "ENVIAR CÓDIGO"}
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={verifyCode} className="auth-form">
-            <label htmlFor="code">Código de verificación</label>
-            <input
-              id="code"
-              className="otp-input"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              maxLength={6}
-              placeholder="000000"
-              value={code}
-              onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))}
-              disabled={loading}
-            />
-
-            <button className="auth-button" type="submit" disabled={loading}>
-              {loading ? <Loader2 className="spin" size={19} /> : "VERIFICAR Y ENTRAR"}
-            </button>
-
-            <button
-              type="button"
-              className="auth-link-button"
-              onClick={() => {
-                setStep("phone");
-                setCode("");
-                setMessage("");
-                setError("");
-              }}
-              disabled={loading}
-            >
-              Cambiar número
-            </button>
-          </form>
-        )}
-
-        {message && (
-          <div className="auth-message success">
-            <CheckCircle2 size={18} /> {message}
-          </div>
-        )}
-
+        <div className="auth-tabs">
+          <button type="button" className={mode === "login" ? "active" : ""} onClick={() => switchMode("login")}>INICIAR SESIÓN</button>
+          <button type="button" className={mode === "register" ? "active" : ""} onClick={() => switchMode("register")}>REGISTRARSE</button>
+        </div>
+        <form onSubmit={submit} className="auth-form">
+          {mode === "register" && <>
+            <label htmlFor="fullName">Nombre completo</label><input id="fullName" autoComplete="name" placeholder="Tu nombre completo" value={fullName} onChange={(e) => setFullName(e.target.value)} disabled={loading} />
+            <label htmlFor="birthDate">Fecha de nacimiento</label><input id="birthDate" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} disabled={loading} />
+            <label htmlFor="country">País</label><select id="country" value={country} onChange={(e) => setCountry(e.target.value)} disabled={loading}>{countries.map((item) => <option key={item.code} value={item.code}>{item.name} ({item.dial})</option>)}</select>
+            <label htmlFor="phone">Número de teléfono</label><div className="phone-field"><span>{selectedCountry.dial}</span><input id="phone" inputMode="numeric" autoComplete="tel" placeholder="8888 8888" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={loading} /></div>
+          </>}
+          <label htmlFor="email">Correo electrónico</label><input id="email" type="email" autoComplete="email" placeholder="tu@correo.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} />
+          <label htmlFor="password">Contraseña</label><input id="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} placeholder="Mínimo 6 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} />
+          <button className="auth-button" type="submit" disabled={loading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : "CREAR CUENTA"}</button>
+        </form>
+        {message && <div className="auth-message success"><CheckCircle2 size={18} /> {message}</div>}
         {error && <div className="auth-message error">{error}</div>}
-
-        <div className="auth-security">
-          <ShieldCheck size={19} />
-          <span>Tu número se usa para verificar tu cuenta y proteger tus recompensas.</span>
-        </div>
+        <div className="auth-security"><ShieldCheck size={19} /><span>Tu teléfono se guarda como dato de seguridad, pero no se utiliza para iniciar sesión.</span></div>
       </section>
     </main>
   );
