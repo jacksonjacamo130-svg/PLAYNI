@@ -3,8 +3,8 @@
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, Eye, EyeOff, KeyRound, Loader2 } from "lucide-react";
-import { supabase } from "../../lib/supabase";
-import BottomNav from "../components/BottomNav";
+import { supabase } from "../../../lib/supabase";
+import BottomNav from "../../components/BottomNav";
 
 export default function PasswordPage() {
   const [newPassword, setNewPassword] = useState("");
