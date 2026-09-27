@@ -49,6 +49,13 @@ export default function HomePage(){
       </div>
     </section>
 
+    <section className="discover-search-section">
+      <label className="discover-search">
+        <Search size={18}/>
+        <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar juegos y ofertas"/>
+      </label>
+    </section>
+
     <section className="discover-offers">
       <div className="discover-heading">
         <div>
