@@ -273,3 +273,75 @@ button,a{font:inherit}
 .notifications-page .notifications-intro h1,.notifications-page .notifications-intro h1::before,.notifications-page .notifications-intro h1::after{border:0!important;text-decoration:none!important;background-image:none!important;box-shadow:none!important}
 @media(max-width:800px){.topbar,.discover-topbar,.inner-page-topbar{height:64px!important;min-height:64px!important;padding:0 14px!important}.topbar .brand,.discover-topbar .brand,.inner-page-topbar .brand{height:64px!important}.topbar .brand-logo,.discover-topbar .brand-logo,.inner-page-topbar .brand-logo,.brand-logo-hero{width:50px!important;height:50px!important;max-width:50px!important;max-height:50px!important}}
 @media(max-width:360px){.topbar .brand-logo,.discover-topbar .brand-logo,.inner-page-topbar .brand-logo,.brand-logo-hero{width:48px!important;height:48px!important;max-width:48px!important;max-height:48px!important}}
+
+
+/* PLAYNI — HEADER AND PROFILE LINK CLEANUP */
+.topbar,.discover-topbar,.inner-page-topbar{
+  height:64px!important;
+  min-height:64px!important;
+  padding:0 16px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+}
+.topbar .brand,.discover-topbar .brand,.inner-page-topbar .brand{
+  position:static!important;
+  left:auto!important;
+  transform:none!important;
+  height:64px!important;
+  min-height:64px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  text-decoration:none!important;
+}
+.topbar .brand-logo,.discover-topbar .brand-logo,.inner-page-topbar .brand-logo,.brand-logo-hero{
+  width:56px!important;
+  height:56px!important;
+  min-width:56px!important;
+  min-height:56px!important;
+  max-width:56px!important;
+  max-height:56px!important;
+  margin:0!important;
+  padding:0!important;
+  object-fit:contain!important;
+  display:block!important;
+  transform:none!important;
+}
+.profile-menu-row,
+.profile-menu-row:hover,
+.profile-menu-row:visited,
+.profile-menu-row:active,
+.profile-menu-row:focus{
+  color:inherit!important;
+  text-decoration:none!important;
+  text-decoration-line:none!important;
+  text-decoration-thickness:0!important;
+  text-decoration-color:transparent!important;
+}
+.profile-menu-row *{
+  text-decoration:none!important;
+  text-decoration-line:none!important;
+}
+.profile-menu-row strong{color:#f5f7fb!important}
+@media(max-width:800px){
+  .topbar,.discover-topbar,.inner-page-topbar{
+    height:64px!important;
+    min-height:64px!important;
+    padding:0 14px!important;
+  }
+  .topbar .brand,.discover-topbar .brand,.inner-page-topbar .brand{height:64px!important;min-height:64px!important}
+  .topbar .brand-logo,.discover-topbar .brand-logo,.inner-page-topbar .brand-logo,.brand-logo-hero{
+    width:52px!important;
+    height:52px!important;
+    min-width:52px!important;
+    min-height:52px!important;
+    max-width:52px!important;
+    max-height:52px!important;
+  }
+}
+@media(max-width:360px){
+  .topbar .brand-logo,.discover-topbar .brand-logo,.inner-page-topbar .brand-logo,.brand-logo-hero{
+    width:50px!important;height:50px!important;min-width:50px!important;min-height:50px!important;max-width:50px!important;max-height:50px!important;
+  }
+}
