@@ -6,7 +6,7 @@ import { Compass, ListChecks, WalletCards, UserCircle2 } from "lucide-react";
 
 const items = [
   { href: "/", label: "Descubrir", icon: Compass },
-  { href: "/tasks", label: "Mis tareas", icon: ListChecks },
+  { href: "/tasks", label: "Mis juegos", icon: ListChecks },
   { href: "/wallet", label: "Billetera", icon: WalletCards },
   { href: "/profile", label: "Perfil", icon: UserCircle2 },
 ];
