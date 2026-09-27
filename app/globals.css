@@ -101,3 +101,76 @@ button,a{font:inherit}
 @media(max-width:850px){.premium-game-grid{grid-template-columns:repeat(2,1fr)}.home-game-strip{grid-template-columns:1fr 1fr}.home-game-card:last-child{display:none}}
 @media(max-width:600px){.games-hero{padding:28px 18px 22px}.games-content{padding:0 18px 105px}.games-toolbar{align-items:stretch;flex-direction:column}.games-search{width:auto}.premium-game-grid{grid-template-columns:1fr}.premium-cover{height:205px}.home-games-first{padding:0 18px}.home-game-strip{grid-template-columns:1fr}.home-game-card:last-child{display:block}.home-game-image{height:165px}}
 .official-paypal-mark{width:58px;height:42px;background:#fff;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:5px}.official-paypal-mark img{max-width:48px;max-height:32px;object-fit:contain}
+
+/* PLAYNI Discover / Testerup-inspired navigation */
+.discover-page{padding-bottom:100px;background:#0b0f1a}
+.discover-topbar{height:82px}
+.brand-logo-hero{width:76px;height:76px}
+.discover-actions{display:flex;align-items:center;gap:10px}
+.profile-circle{display:grid;place-items:center;color:#dfe3ee;text-decoration:none}
+.profile-circle:hover{color:#ffc83d}
+.discover-welcome{max-width:1180px;margin:0 auto;padding:30px clamp(18px,5vw,60px) 20px}
+.discover-welcome h1{font-size:clamp(28px,4vw,42px);margin:9px 0 7px;letter-spacing:-.035em}
+.discover-welcome p{margin:0;color:#929aac;font-size:14px}
+.discover-offers{max-width:1180px;margin:0 auto;padding:4px clamp(18px,5vw,60px)}
+.discover-heading{display:flex;align-items:end;justify-content:space-between;gap:15px;margin:8px 0 17px}
+.discover-heading h2{font-size:29px;margin:7px 0 0;letter-spacing:-.025em}
+.discover-count{font-size:11px;color:#7f899c;white-space:nowrap}
+.discover-search{height:50px;display:flex;align-items:center;gap:10px;border:1px solid #30394d;background:#121927;border-radius:14px;padding:0 15px;margin-bottom:20px;color:#8e97aa}
+.discover-search:focus-within{border-color:#ffc83d;box-shadow:0 0 0 3px #ffc83d14}
+.discover-search input{border:0;outline:0;background:transparent;color:#fff;width:100%;font-size:13px}
+.discover-search input::placeholder{color:#687286}
+.discover-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.discover-card{overflow:hidden;border:1px solid #293246;border-radius:20px;background:#121927;box-shadow:0 16px 45px #0003}
+.discover-cover{height:220px;position:relative;display:grid;place-items:center;background:linear-gradient(145deg,#1d2940,#121827);overflow:hidden}
+.discover-cover img{width:100%;height:100%;object-fit:cover}
+.discover-cover>span{position:absolute;top:13px;left:13px;background:#ffc83d;color:#111827;padding:7px 10px;border-radius:8px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+.discover-cover-placeholder{display:grid;place-items:center;width:86px;height:86px;border-radius:22px;background:#202a3e;color:#ffc83d}
+.discover-card-body{padding:18px}
+.discover-card-title{display:flex;align-items:start;justify-content:space-between;gap:12px}
+.discover-card-title h3{margin:0;font-size:19px;line-height:1.15;overflow-wrap:anywhere}
+.discover-card-title strong{color:#ffc83d;font-size:11px;white-space:nowrap}
+.discover-card-body>p{color:#8e97aa;font-size:12px;line-height:1.5;min-height:36px;margin:10px 0}
+.discover-meta{display:flex;justify-content:space-between;gap:10px;color:#737e93;font-size:10px;margin:12px 0}
+.discover-meta span:first-child{display:flex;align-items:center;gap:5px}
+.discover-meta svg{color:#ffc83d}
+.discover-cta{display:flex;align-items:center;justify-content:center;gap:5px;background:#ffc83d;color:#111827;text-decoration:none;font-size:11px;font-weight:1000;border-radius:11px;padding:13px}
+.discover-loading{display:flex;align-items:center;justify-content:center;gap:10px;min-height:220px;color:#929aac;border:1px dashed #303a4f;border-radius:18px}
+.discover-empty{margin-top:4px}
+.discover-trust{max-width:1180px;margin:20px auto 0;padding:0 clamp(18px,5vw,60px);display:flex;align-items:center;gap:8px;color:#737e93;font-size:11px}
+.discover-trust svg{color:#ffc83d;flex:none}
+.inner-page-topbar{height:82px}
+.page-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:900;letter-spacing:.12em}
+.page-title svg{color:#ffc83d}
+.wallet-page{padding-bottom:100px}
+.wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo{width:76px;height:76px}
+.wallet-page .wallet-hero{margin-top:25px}
+@media(max-width:800px){
+  .discover-page{padding-bottom:92px}
+  .discover-topbar,.inner-page-topbar{height:78px}
+  .brand-logo-hero{width:66px;height:66px}
+  .wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo{width:66px;height:66px}
+  .discover-welcome{padding-top:20px}
+  .discover-heading h2{font-size:25px}
+  .discover-grid{grid-template-columns:1fr;gap:14px}
+  .discover-cover{height:205px}
+  .discover-card-body{padding:16px}
+  .discover-search{height:52px;margin-bottom:16px}
+  .discover-trust{padding-bottom:6px}
+  .wallet-page .wallet-hero{margin-left:14px;margin-right:14px}
+  .wallet-page .wallet-card,.wallet-page .wallet-history{margin-left:14px;margin-right:14px}
+}
+@media(max-width:480px){
+  .discover-topbar,.inner-page-topbar{padding:0 12px}
+  .brand-logo-hero{width:62px;height:62px}
+  .wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo{width:62px;height:62px}
+  .discover-welcome{padding:17px 16px 16px}
+  .discover-welcome h1{font-size:29px}
+  .discover-welcome p{font-size:12px}
+  .discover-offers{padding-left:16px;padding-right:16px}
+  .discover-heading{margin-bottom:13px}
+  .discover-count{font-size:9px}
+  .discover-cover{height:190px}
+  .discover-card-title h3{font-size:18px}
+  .discover-trust{padding-left:16px;padding-right:16px;font-size:10px}
+}
