@@ -51,7 +51,7 @@ button,a{font:inherit}.topbar{height:68px;display:flex;align-items:center;justif
 
 /* Authentication and logo sizing fixes */
 .brand-logo{width:42px;height:42px;object-fit:contain;display:block;flex:none}
-.auth-logo{width:112px;height:auto;max-height:112px;object-fit:contain;border-radius:0;display:block}
+.auth-logo{width:150px;height:150px;max-height:150px;object-fit:contain;border-radius:0;display:block}
 .auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;margin:0 0 18px;background:#111827;border:1px solid #293246;border-radius:12px}
 .auth-tabs button{border:0;background:transparent;color:#858da0;border-radius:9px;padding:10px 7px;font-size:10px;font-weight:900;cursor:pointer}
 .auth-tabs button.active{background:#ffc83d;color:#111827}
