@@ -33,7 +33,7 @@ export default function HomePage() {
     let mounted = true;
     async function loadAccount() {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { if (mounted) setLoading(false); return; }
+      if (!user) { window.location.replace("/login"); return; }
       const [{ data: profileData }, { data: walletData }] = await Promise.all([
         supabase.from("profiles").select("full_name,display_name,country_code,phone_verified").eq("id", user.id).maybeSingle(),
         supabase.from("wallets").select("coins,lifetime_earned").eq("user_id", user.id).maybeSingle()
@@ -51,7 +51,7 @@ export default function HomePage() {
   async function signOut() {
     setSigningOut(true);
     await supabase.auth.signOut({ scope: "local" });
-    window.location.href = "/";
+    window.location.href = "/login";
   }
 
   const firstName = profile?.full_name?.trim().split(" ")[0] || profile?.display_name || "Jugador";
@@ -61,7 +61,7 @@ export default function HomePage() {
     <main className="app-shell">
       <header className="topbar">
         <div className="brand">
-          <img src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI" width={42} height={42} />
+          <img className="brand-logo" src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI" />
           <span>PLAYNI</span>
         </div>
         {loading ? (
