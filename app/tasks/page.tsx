@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ListChecks, Clock3, Gamepad2, LoaderCircle, CheckCircle2, Circle, Smartphone, TimerReset } from "lucide-react";
 import BottomNav from "../components/BottomNav";
 import { supabase } from "../../lib/supabase";
+import styles from "./tasks.module.css";
 
 type Task = {
   id:string; name:string; reward_coins:number|null;
@@ -74,25 +75,25 @@ export default function TasksPage(){
     <section className="simple-section tasks-section">
       <div className="simple-head"><div><span className="eyebrow">TU PROGRESO</span><h1>Mis tareas</h1></div></div>
 
-      {loading ? <div className="tasks-loading"><LoaderCircle className="spin" size={26}/><span>Cargando tus juegos...</span></div> :
+      {loading ? <div className={styles.tasksLoading}><LoaderCircle className="spin" size={26}/><span>Cargando tus juegos...</span></div> :
       offers.length===0 ? <div className="tasks-empty"><div className="continue-icon"><Gamepad2 size={25}/></div><h2>Aún no tienes tareas</h2><p>Cuando empieces una oferta, aparecerá aquí con sus objetivos, progreso y tiempo restante.</p><Link className="primary-btn" href="/">DESCUBRIR OFERTAS <Gamepad2 size={17}/></Link></div> :
-      <div className="started-offers-list">
-        {sections.active.length>0 && <section className="task-group"><div className="task-group-title"><span>ACTIVAS</span><strong>{sections.active.length}</strong></div>{sections.active.map(o=>{
+      <div className={styles.startedOffersList}>
+        {sections.active.length>0 && <section className={styles.taskGroup}><div className={styles.taskGroupTitle}><span>ACTIVAS</span><strong>{sections.active.length}</strong></div>{sections.active.map(o=>{
           const progress=progressFor(o);
-          return <article className="started-offer-card" key={o.id}>
-            <div className="started-offer-main">
-              <div className="started-offer-icon">{o.icon_url?<img src={o.icon_url} alt=""/>:<Gamepad2 size={26}/>}</div>
-              <div className="started-offer-info"><div className="started-offer-name-row"><h2>{o.title}</h2><span className="started-status active">ACTIVA</span></div><p>{o.description||"Completa los objetivos para ganar tus recompensas."}</p><div className="started-offer-meta"><span><TimerReset size={14}/> Iniciada {formatDate(o.started_at)}</span><span><Clock3 size={14}/> {o.deadline_at ? "Hasta " + formatDate(o.deadline_at) : "Sin límite"}</span></div></div>
+          return <article className={styles.startedOfferCard} key={o.id}>
+            <div className={styles.startedOfferMain}>
+              <div className={styles.startedOfferIcon}>{o.icon_url?<img src={o.icon_url} alt=""/>:<Gamepad2 size={26}/>}</div>
+              <div className={styles.startedOfferInfo}><div className={styles.startedOfferNameRow}><h2>{o.title}</h2><span className={styles.startedStatus+" "+styles.active}>ACTIVA</span></div><p>{o.description||"Completa los objetivos para ganar tus recompensas."}</p><div className={styles.startedOfferMeta}><span><TimerReset size={14}/> Iniciada {formatDate(o.started_at)}</span><span><Clock3 size={14}/> {o.deadline_at ? "Hasta " + formatDate(o.deadline_at) : "Sin límite"}</span></div></div>
             </div>
-            <div className="started-progress"><div className="started-progress-top"><span>Progreso</span><strong>{progress}%</strong></div><div className="started-progress-track"><span style={{width:progress+"%"}}/></div></div>
-            <div className="install-state"><Smartphone size={15}/><span>{o.install_confirmed?"Instalación confirmada":"Instalación pendiente de verificación"}</span></div>
-            <div className="goal-list">{o.user_offer_tasks.length?o.user_offer_tasks.map(t=><div className="goal-row" key={t.id}>{t.status==="pending"?<Circle size={17}/>:<CheckCircle2 size={17}/>}<span>{t.name}</span>{t.reward_coins!=null&&<strong>+{t.reward_coins}</strong>}</div>):<div className="goal-row goal-empty"><Circle size={17}/><span>Los objetivos aparecerán cuando el proveedor los envíe.</span></div>}</div>
+            <div className={styles.startedProgress}><div className={styles.startedProgressTop}><span>Progreso</span><strong>{progress}%</strong></div><div className={styles.startedProgressTrack}><span style={{width:progress+"%"}}/></div></div>
+            <div className={styles.installState}><Smartphone size={15}/><span>{o.install_confirmed?"Instalación confirmada":"Instalación pendiente de verificación"}</span></div>
+            <div className={styles.goalList}>{o.user_offer_tasks.length?o.user_offer_tasks.map(t=><div className={styles.goalRow} key={t.id}>{t.status==="pending"?<Circle size={17}/>:<CheckCircle2 size={17}/>}<span>{t.name}</span>{t.reward_coins!=null&&<strong>+{t.reward_coins}</strong>}</div>):<div className={styles.goalRow+" "+styles.goalEmpty}><Circle size={17}/><span>Los objetivos aparecerán cuando el proveedor los envíe.</span></div>}</div>
           </article>
         })}</section>}
 
-        {sections.completed.length>0 && <section className="task-group"><div className="task-group-title"><span>COMPLETADAS</span><strong>{sections.completed.length}</strong></div>{sections.completed.map(o=><article className="started-offer-card compact" key={o.id}><div className="started-offer-icon">{o.icon_url?<img src={o.icon_url} alt=""/>:<Gamepad2 size={26}/>}</div><div className="started-offer-info"><div className="started-offer-name-row"><h2>{o.title}</h2><span className="started-status completed">COMPLETADA</span></div><p>Esta tarea ya aparece como completada en tu historial.</p></div><div className="completed-check"><CheckCircle2 size={24}/></div></article>)}</section>}
+        {sections.completed.length>0 && <section className={styles.taskGroup}><div className={styles.taskGroupTitle}><span>COMPLETADAS</span><strong>{sections.completed.length}</strong></div>{sections.completed.map(o=><article className={styles.startedOfferCard+" "+styles.compact} key={o.id}><div className={styles.startedOfferIcon}>{o.icon_url?<img src={o.icon_url} alt=""/>:<Gamepad2 size={26}/>}</div><div className={styles.startedOfferInfo}><div className={styles.startedOfferNameRow}><h2>{o.title}</h2><span className={styles.startedStatus+" "+styles.completed}>COMPLETADA</span></div><p>Esta tarea ya aparece como completada en tu historial.</p></div><div className={styles.completedCheck}><CheckCircle2 size={24}/></div></article>)}</section>}
 
-        {sections.expired.length>0 && <section className="task-group"><div className="task-group-title"><span>EXPIRADAS</span><strong>{sections.expired.length}</strong></div>{sections.expired.map(o=><article className="started-offer-card compact" key={o.id}><div className="started-offer-icon">{o.icon_url?<img src={o.icon_url} alt=""/>:<Gamepad2 size={26}/>}</div><div className="started-offer-info"><div className="started-offer-name-row"><h2>{o.title}</h2><span className="started-status expired">EXPIRADA</span></div><p>El plazo de esta oferta terminó.</p></div></article>)}</section>}
+        {sections.expired.length>0 && <section className={styles.taskGroup}><div className={styles.taskGroupTitle}><span>EXPIRADAS</span><strong>{sections.expired.length}</strong></div>{sections.expired.map(o=><article className={styles.startedOfferCard+" "+styles.compact} key={o.id}><div className={styles.startedOfferIcon}>{o.icon_url?<img src={o.icon_url} alt=""/>:<Gamepad2 size={26}/>}</div><div className={styles.startedOfferInfo}><div className={styles.startedOfferNameRow}><h2>{o.title}</h2><span className={styles.startedStatus+" "+styles.expired}>EXPIRADA</span></div><p>El plazo de esta oferta terminó.</p></div></article>)}</section>}
       </div>}
 
       <div className="task-help"><Clock3 size={17}/><span>PLAYNI conserva tus juegos iniciados y sus objetivos asociados a tu cuenta.</span></div>
