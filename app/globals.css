@@ -263,3 +263,13 @@ button,a{font:inherit}
 @media(max-width:800px){
  .topbar .brand-logo,.brand-logo-hero,.wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo,.inner-page-topbar .brand-logo{width:50px;height:50px}
 }
+
+
+/* PLAYNI — FINAL UNIFIED TOPBAR */
+.topbar,.discover-topbar,.inner-page-topbar{height:64px!important;min-height:64px!important;padding:0 16px!important;display:flex!important;align-items:center!important}
+.topbar .brand,.discover-topbar .brand,.inner-page-topbar .brand{position:static!important;transform:none!important;height:64px!important;display:flex!important;align-items:center!important}
+.topbar .brand-logo,.discover-topbar .brand-logo,.inner-page-topbar .brand-logo,.brand-logo-hero{width:58px!important;height:58px!important;max-width:58px!important;max-height:58px!important;object-fit:contain!important;display:block!important;transform:none!important}
+.notifications-page .topbar{border-bottom:0!important}
+.notifications-page .notifications-intro h1,.notifications-page .notifications-intro h1::before,.notifications-page .notifications-intro h1::after{border:0!important;text-decoration:none!important;background-image:none!important;box-shadow:none!important}
+@media(max-width:800px){.topbar,.discover-topbar,.inner-page-topbar{height:64px!important;min-height:64px!important;padding:0 14px!important}.topbar .brand,.discover-topbar .brand,.inner-page-topbar .brand{height:64px!important}.topbar .brand-logo,.discover-topbar .brand-logo,.inner-page-topbar .brand-logo,.brand-logo-hero{width:50px!important;height:50px!important;max-width:50px!important;max-height:50px!important}}
+@media(max-width:360px){.topbar .brand-logo,.discover-topbar .brand-logo,.inner-page-topbar .brand-logo,.brand-logo-hero{width:48px!important;height:48px!important;max-width:48px!important;max-height:48px!important}}
