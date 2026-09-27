@@ -63,7 +63,6 @@ export default function LoginPage() {
       <section className="auth-card">
         <div className="auth-logo-wrap"><img className="auth-logo" src={logoUrl} alt="PLAYNI" /></div>
         <div className="auth-heading">
-          <span className="auth-kicker">PLAYNI</span>
           <h1>{mode === "login" ? "Inicia sesión" : "Crea tu cuenta"}</h1>
           <p>{mode === "login" ? "Entra con el correo y la contraseña de tu cuenta PLAYNI." : "Crea tu cuenta con correo y contraseña. El teléfono se solicita como requisito de seguridad."}</p>
         </div>
