@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Coins, ChevronRight, Clock3, LoaderCircle, Search, ShieldCheck, Sparkles, UserCircle2, Gamepad2 } from "lucide-react";
+import { Coins, ChevronRight, Clock3, LoaderCircle, Search, ShieldCheck, Sparkles,  Gamepad2 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import BottomNav from "./components/BottomNav";
 
@@ -37,7 +37,7 @@ export default function HomePage(){
       </Link>
       <div className="discover-actions">
         <Link className="balance account-balance" href="/wallet"><Coins size={16}/><strong>{"$"+balance}</strong><ChevronRight size={14}/></Link>
-        <Link className="profile-circle" href="/profile" aria-label="Mi perfil"><UserCircle2 size={28}/></Link>
+        
       </div>
     </header>
 
