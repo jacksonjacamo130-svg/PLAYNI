@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { UserCircle2, ShieldCheck, LogOut, Mail, MapPin, UserRound, Bell, KeyRound, Settings2, ChevronRight, Clock3 } from "lucide-react";
+import { UserCircle2, LogOut, Mail, MapPin, UserRound, Bell, KeyRound, Settings2, ChevronRight, Clock3 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import BottomNav from "../components/BottomNav";
 
@@ -50,20 +50,18 @@ export default function ProfilePage(){
     </header>
     <section className="profile-content">
       <div className="profile-intro">
-        <span className="eyebrow">TU CUENTA</span><h1>Mi perfil</h1>
-        <p>Administra la información y las opciones de tu cuenta PLAYNI.</p>
+        <span className="eyebrow">MI PERFIL</span><h1>{name}</h1>
+        <p>ID de usuario · <strong>{userId||"Cargando..."}</strong></p>
       </div>
       <section className="profile-section">
-        <div className="profile-section-title"><UserRound size={17}/><span>INFORMACIÓN PERSONAL</span></div>
+        <div className="profile-section-title"><UserRound size={17}/><span>DATOS PERSONALES</span></div>
         <div className="profile-card">
-          <div className="profile-head"><div className="profile-avatar"><UserCircle2 size={42}/></div><div><div className="profile-status"><ShieldCheck size={15}/> CUENTA PLAYNI</div><strong className="profile-name">{name}</strong></div></div>
+          <div className="profile-head"><div className="profile-avatar"><UserCircle2 size={42}/></div><div><strong className="profile-name">{name}</strong><span className="profile-id-sub">{userId||"Cargando..."}</span></div></div>
           <div className="profile-info-list">
             <div className="profile-info-row"><div className="profile-info-icon"><Mail size={18}/></div><div><span>Correo</span><strong>{email||"Cargando..."}</strong></div></div>
-            <div className="profile-info-row"><div className="profile-info-icon"><UserRound size={18}/></div><div><span>Nombre</span><strong>{name}</strong></div></div>
             <div className="profile-info-row"><div className="profile-info-icon"><MapPin size={18}/></div><div><span>País</span><strong>{country}</strong></div></div>
             <div className="profile-info-row"><div className="profile-info-icon"><UserRound size={18}/></div><div><span>Género</span><strong>{gender}</strong></div></div>
             <div className="profile-info-row"><div className="profile-info-icon"><Clock3 size={18}/></div><div><span>Fecha de nacimiento</span><strong>{birthDate}</strong></div></div>
-            <div className="profile-info-row"><div className="profile-info-icon"><ShieldCheck size={18}/></div><div><span>ID de usuario</span><strong>{userId||"Cargando..."}</strong></div></div>
           </div>
         </div>
       </section>
