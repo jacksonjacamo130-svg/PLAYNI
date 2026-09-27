@@ -81,7 +81,7 @@ export default function HomePage() {
           <h1>Tu próxima<br /><span>recompensa</span><br />empieza aquí.</h1>
           <p>Elige un juego, completa objetivos y mira cómo tus ganancias aumentan paso a paso.</p>
           <div className="hero-actions">
-            <a className="primary-btn" href={profile ? "#ofertas" : "/login"}>{profile ? "VER OFERTAS" : "EMPEZAR A GANAR" <ChevronRight size={18} /></a>
+            <a className="primary-btn" href={profile ? "#ofertas" : "/login"}>{profile ? "VER OFERTAS" : "EMPEZAR A GANAR"} <ChevronRight size={18} /></a>
             <span className="trust"><ShieldCheck size={15} /> Sin costo para empezar</span>
           </div>
         </div>
