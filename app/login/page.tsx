@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
@@ -13,7 +13,7 @@ const countries = [
 const logoUrl = "https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png";
 
 export default function LoginPage() {
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register" | "reset">("login");
   const [fullName, setFullName] = useState(""), [birthDate, setBirthDate] = useState(""), [gender, setGender] = useState(""), [country, setCountry] = useState("NI");
   const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -21,13 +21,27 @@ export default function LoginPage() {
   const selectedCountry = useMemo(() => countries.find((item) => item.code === country) ?? countries[0], [country]);
   const fullPhone = () => selectedCountry.dial + phone.replace(/\D/g, "");
 
-  function switchMode(next: "login" | "register") { setMode(next); setError(""); setMessage(""); }
+  function switchMode(next: "login" | "register" | "reset") { setMode(next); setError(""); setMessage(""); }
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("reset") === "1") setMode("reset");
+  }, []);
 
   async function submit(event: FormEvent) {
     event.preventDefault(); setError(""); setMessage("");
     if (!email.trim() || !email.includes("@")) return setError("Escribe un correo electrónico válido.");
     if (password.length < 6) return setError("La contraseña debe tener al menos 6 caracteres.");
-    if (mode === "register" && password !== confirmPassword) return setError("Las contraseñas no coinciden.");
+    if ((mode === "register" || mode === "reset") && password !== confirmPassword) return setError("Las contraseñas no coinciden.");
+
+    if (mode === "reset") {
+      const { error: resetError } = await supabase.auth.updateUser({ password });
+      setLoading(false);
+      if (resetError) return setError("No pudimos cambiar la contraseña. Abre nuevamente el enlace de recuperación desde tu correo.");
+      setMessage("Contraseña actualizada correctamente. Ya puedes continuar en PLAYNI.");
+      window.history.replaceState({}, "", "/login");
+      setTimeout(() => { window.location.href = "/"; }, 700);
+      return;
+    }
 
     if (mode === "register") {
       if (fullName.trim().length < 2) return setError("Escribe tu nombre completo.");
@@ -66,13 +80,13 @@ export default function LoginPage() {
       <section className="auth-card">
         <div className="auth-logo-wrap"><img className="auth-logo" src={logoUrl} alt="PLAYNI" /></div>
         <div className="auth-heading">
-          <h1>{mode === "login" ? "Inicia sesión" : "Crea tu cuenta"}</h1>
-          <p>{mode === "login" ? "Entra con el correo y la contraseña de tu cuenta PLAYNI." : "Crea tu cuenta con correo y contraseña. El teléfono se solicita como requisito de seguridad."}</p>
+          <h1>{mode === "login" ? "Inicia sesión" : mode === "reset" ? "Cambia tu contraseña" : "Crea tu cuenta"}</h1>
+          <p>{mode === "login" ? "Entra con el correo y la contraseña de tu cuenta PLAYNI." : mode === "reset" ? "Escribe una nueva contraseña para recuperar el acceso a tu cuenta." : "Crea tu cuenta con correo y contraseña. El teléfono se solicita como requisito de seguridad."}</p>
         </div>
-        <div className="auth-tabs">
+        {mode !== "reset" && <div className="auth-tabs">
           <button type="button" className={mode === "login" ? "active" : ""} onClick={() => switchMode("login")}>INICIAR SESIÓN</button>
           <button type="button" className={mode === "register" ? "active" : ""} onClick={() => switchMode("register")}>REGISTRARSE</button>
-        </div>
+        </div>}
         <form onSubmit={submit} className="auth-form">
           {mode === "register" && <>
             <label htmlFor="fullName">Nombre completo</label><input id="fullName" autoComplete="name" placeholder="Tu nombre completo" value={fullName} onChange={(e) => setFullName(e.target.value)} disabled={loading} />
@@ -86,7 +100,7 @@ export default function LoginPage() {
             <label htmlFor="country">País</label><select id="country" value={country} onChange={(e) => setCountry(e.target.value)} disabled={loading}>{countries.map((item) => <option key={item.code} value={item.code}>{item.name} ({item.dial})</option>)}</select>
             <label htmlFor="phone">Número de teléfono</label><div className="phone-field"><span>{selectedCountry.dial}</span><input id="phone" inputMode="numeric" autoComplete="tel" placeholder="8888 8888" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={loading} /></div>
           </>}
-          <label htmlFor="email">Correo electrónico</label><input id="email" type="email" autoComplete="email" placeholder="tu@correo.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} />
+          <label htmlFor="email">Correo electrónico</label><input id="email" type="email" autoComplete="email" placeholder="tu@correo.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading || mode === "reset"} />
           <label htmlFor="password">Contraseña</label>
           <div className="password-field">
             <input id="password" type={showPassword ? "text" : "password"} autoComplete={mode === "login" ? "current-password" : "new-password"} placeholder="Mínimo 6 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} />
@@ -94,7 +108,7 @@ export default function LoginPage() {
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
-          {mode === "register" && <>
+          {(mode === "register" || mode === "reset") && <>
             <label htmlFor="confirmPassword">Confirmar contraseña</label>
             <div className="password-field">
               <input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} autoComplete="new-password" placeholder="Repite tu contraseña" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={loading} />
@@ -103,7 +117,16 @@ export default function LoginPage() {
               </button>
             </div>
           </>}
-          <button className="auth-button" type="submit" disabled={loading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : "CREAR CUENTA"}</button>
+          <button className="auth-button" type="submit" disabled={loading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : mode === "reset" ? "CAMBIAR CONTRASEÑA" : "CREAR CUENTA"}</button>
+        {mode === "login" && <button type="button" className="auth-link-button" onClick={async () => {
+          if (!email.trim() || !email.includes("@")) return setError("Escribe primero tu correo electrónico.");
+          setLoading(true); setError(""); setMessage("");
+          const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin + "/login?reset=1" });
+          setLoading(false);
+          if (resetError) return setError("No pudimos enviar el enlace de recuperación. Inténtalo de nuevo.");
+          setMessage("Te enviamos un enlace para cambiar tu contraseña. Revisa tu correo y la carpeta de spam.");
+        }}>¿Olvidaste tu contraseña?</button>}
+        {mode === "reset" && <button type="button" className="auth-link-button" onClick={() => { window.location.href = "/login"; }}>Volver a iniciar sesión</button>}
         </form>
         {message && <div className="auth-message success"><CheckCircle2 size={18} /> {message}</div>}
         {error && <div className="auth-message error">{error}</div>}
