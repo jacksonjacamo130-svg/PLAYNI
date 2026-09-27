@@ -57,15 +57,6 @@ export default function HomePage(){
       </div>
     </section>
 
-    <section className="active-games-banner">
-      <div className="active-games-icon"><ListChecks size={20}/></div>
-      <div className="active-games-copy">
-        <strong>{startedCount > 0 ? "Tenés " + startedCount + (startedCount===1 ? " juego activo" : " juegos activos") : "Mis juegos"}</strong>
-        <span>{startedCount > 0 ? "Seguí tus objetivos y tu progreso." : "Aquí aparecerán los juegos que inicies."}</span>
-      </div>
-      <Link href="/tasks" className="active-games-link">{startedCount > 0 ? "VER MIS JUEGOS" : "ABRIR"} <ChevronRight size={16}/></Link>
-    </section>
-
     <section className="discover-search-section">
       <label className="discover-search">
         <Search size={18}/>
