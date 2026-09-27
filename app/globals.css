@@ -234,3 +234,24 @@ button,a{font:inherit}
 .notifications-note strong{display:block;color:#dfe3ee;font-size:11px}
 .notifications-note p{margin:5px 0 0;font-size:10px;line-height:1.5}
 @media(max-width:800px){.notifications-page{padding-bottom:92px}.notifications-content{padding:22px 16px}.notifications-intro h1{font-size:29px}}
+
+/* PLAYNI consistency fixes */
+.topbar{height:64px}
+.topbar .brand-logo{width:54px;height:54px;object-fit:contain;display:block;flex:none}
+.brand-logo-hero{width:54px;height:54px;transform:none}
+.discover-topbar,.inner-page-topbar{height:64px}
+.wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo,.inner-page-topbar .brand-logo{width:54px;height:54px}
+.profile-info-list-first{margin-top:0}
+@media(max-width:800px){
+  .topbar,.discover-topbar,.inner-page-topbar{height:64px}
+  .topbar{padding:0 14px}
+  .brand{position:static;transform:none}
+  .topbar .brand-logo,.brand-logo-hero,.wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo,.inner-page-topbar .brand-logo{width:42px;height:42px;transform:none}
+}
+@media(max-width:480px){
+  .discover-topbar,.inner-page-topbar{padding:0 14px}
+}
+@media(max-width:360px){
+  .topbar{padding:0 14px}
+  .topbar .brand-logo,.brand-logo-hero,.wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo,.inner-page-topbar .brand-logo{width:42px;height:42px}
+}
