@@ -63,7 +63,7 @@ export default function WalletPage() {
       <header className="topbar">
         <a className="back-link" href="/"><ArrowLeft size={19} /></a>
         <div className="brand"><WalletCards size={25} /><span>BILLETERA</span></div>
-        <div className="wallet-mini"><Coins size={16} /> ${balance}</div>
+        <div className="wallet-mini">BILLETERA</div>
       </header>
 
       <section className="wallet-hero">
@@ -73,16 +73,10 @@ export default function WalletPage() {
         <div className="wallet-total"><span>Ganado de por vida</span><strong>${earned}</strong></div>
       </section>
 
-      <section className="wallet-info-grid">
-        <div><Coins size={20} /><span>Disponible</span><strong>${balance}</strong></div>
-        <div><Clock3 size={20} /><span>Pendiente</span><strong>${pending}</strong></div>
-        <div><CreditCard size={20} /><span>Método</span><strong>PayPal</strong></div>
-      </section>
-
       <section className="wallet-card">
         <div className="wallet-card-head">
           <div><span className="eyebrow">MÉTODO DE RETIRO</span><h2>PayPal</h2></div>
-          <div className="paypal-mark">P</div>
+          <div className="paypal-mark official-paypal-mark"><img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal"/></div>
         </div>
         <p className="wallet-muted">Usa el correo de tu cuenta PayPal. Las recompensas primero deben validarse y luego estarán disponibles para retirar.</p>
         <label className="wallet-label">Correo de PayPal</label>
