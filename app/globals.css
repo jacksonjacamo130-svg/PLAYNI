@@ -32,7 +32,7 @@ button,a{font:inherit}
   .how{padding:0 28px}.steps{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:800px){
-  .brand-logo{width:52px;height:52px}
+  .brand-logo{width:76px;height:76px}
   .app-shell{padding-bottom:84px}
   .topbar{height:64px;padding:0 14px;position:sticky}
   .brand{position:absolute;left:50%;transform:translateX(-50%);font-size:17px;gap:7px}.brand-logo{width:42px;height:42px}
@@ -104,8 +104,8 @@ button,a{font:inherit}
 
 /* PLAYNI Discover / Testerup-inspired navigation */
 .discover-page{padding-bottom:100px;background:#0b0f1a}
-.discover-topbar{height:82px}
-.brand-logo-hero{width:76px;height:76px}
+.discover-topbar{height:96px}
+.brand-logo-hero{width:94px;height:94px;transform:scale(1.03);transform-origin:center}
 .discover-actions{display:flex;align-items:center;gap:10px}
 .profile-circle{display:grid;place-items:center;color:#dfe3ee;text-decoration:none}
 .profile-circle:hover{color:#ffc83d}
@@ -139,17 +139,17 @@ button,a{font:inherit}
 .discover-empty{margin-top:4px}
 .discover-trust{max-width:1180px;margin:20px auto 0;padding:0 clamp(18px,5vw,60px);display:flex;align-items:center;gap:8px;color:#737e93;font-size:11px}
 .discover-trust svg{color:#ffc83d;flex:none}
-.inner-page-topbar{height:82px}
+.inner-page-topbar{height:96px}
 .page-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:900;letter-spacing:.12em}
 .page-title svg{color:#ffc83d}
 .wallet-page{padding-bottom:100px}
-.wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo{width:76px;height:76px}
+.wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo{width:94px;height:94px}
 .wallet-page .wallet-hero{margin-top:25px}
 @media(max-width:800px){
   .discover-page{padding-bottom:92px}
-  .discover-topbar,.inner-page-topbar{height:78px}
-  .brand-logo-hero{width:66px;height:66px}
-  .wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo{width:66px;height:66px}
+  .discover-topbar,.inner-page-topbar{height:88px}
+  .brand-logo-hero{width:82px;height:82px;transform:scale(1.03);transform-origin:center}
+  .wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo,.inner-page-topbar .brand-logo{width:82px;height:82px}
   .discover-welcome{padding-top:20px}
   .discover-heading h2{font-size:25px}
   .discover-grid{grid-template-columns:1fr;gap:14px}
@@ -162,8 +162,8 @@ button,a{font:inherit}
 }
 @media(max-width:480px){
   .discover-topbar,.inner-page-topbar{padding:0 12px}
-  .brand-logo-hero{width:62px;height:62px}
-  .wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo{width:62px;height:62px}
+  .brand-logo-hero{width:76px;height:76px;transform:scale(1.03);transform-origin:center}
+  .wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo,.inner-page-topbar .brand-logo{width:76px;height:76px}
   .discover-welcome{padding:17px 16px 16px}
   .discover-welcome h1{font-size:29px}
   .discover-welcome p{font-size:12px}
@@ -216,7 +216,7 @@ button,a{font:inherit}
 .notifications-back{display:flex;align-items:center;gap:7px;color:#dfe3ee;text-decoration:none;font-size:11px;font-weight:900;letter-spacing:.08em}
 .notifications-back:hover{color:#ffc83d}
 .notifications-card{margin-top:24px;background:#121927;border:1px solid #2b3549;border-radius:18px;overflow:hidden;box-shadow:0 14px 40px #0002}
-.notification-row{min-height:82px;display:flex;align-items:center;gap:13px;padding:14px 16px;border-bottom:1px solid #293348}
+.notification-row{min-height:82px;display:flex;align-items:center;gap:13px;padding:14px 16px;border-bottom:0}
 .notification-row:last-child{border-bottom:0}
 .notification-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#1a2335;color:#ffc83d;flex:none}
 .notification-copy{min-width:0;flex:1}
