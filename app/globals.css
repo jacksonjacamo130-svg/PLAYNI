@@ -139,17 +139,17 @@ button,a{font:inherit}
 .discover-empty{margin-top:4px}
 .discover-trust{max-width:1180px;margin:20px auto 0;padding:0 clamp(18px,5vw,60px);display:flex;align-items:center;gap:8px;color:#737e93;font-size:11px}
 .discover-trust svg{color:#ffc83d;flex:none}
-.inner-page-topbar{height:96px}
+.inner-page-topbar{height:64px}
 .page-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:900;letter-spacing:.12em}
 .page-title svg{color:#ffc83d}
 .wallet-page{padding-bottom:100px}
-.wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo{width:94px;height:94px}
+.wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo{width:58px;height:58px}
 .wallet-page .wallet-hero{margin-top:25px}
 @media(max-width:800px){
   .discover-page{padding-bottom:92px}
-  .discover-topbar,.inner-page-topbar{height:88px}
+  .discover-topbar{height:88px}\n  .inner-page-topbar{height:62px}
   .brand-logo-hero{width:82px;height:82px;transform:scale(1.03);transform-origin:center}
-  .wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo,.inner-page-topbar .brand-logo{width:82px;height:82px}
+  .wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo{width:82px;height:82px}\n  .inner-page-topbar .brand-logo{width:48px;height:48px}
   .discover-welcome{padding-top:20px}
   .discover-heading h2{font-size:25px}
   .discover-grid{grid-template-columns:1fr;gap:14px}
@@ -163,7 +163,7 @@ button,a{font:inherit}
 @media(max-width:480px){
   .discover-topbar,.inner-page-topbar{padding:0 12px}
   .brand-logo-hero{width:76px;height:76px;transform:scale(1.03);transform-origin:center}
-  .wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo,.inner-page-topbar .brand-logo{width:76px;height:76px}
+  .wallet-page .topbar .brand-logo,.tasks-page .topbar .brand-logo{width:76px;height:76px}\n  .inner-page-topbar .brand-logo{width:46px;height:46px}
   .discover-welcome{padding:17px 16px 16px}
   .discover-welcome h1{font-size:29px}
   .discover-welcome p{font-size:12px}
@@ -179,11 +179,11 @@ button,a{font:inherit}
 /* Profile menu */
 .profile-page{padding-bottom:100px}
 .profile-content{max-width:720px;margin:0 auto;padding:28px 20px}
-.profile-intro h1{font-size:32px;margin:8px 0 6px;letter-spacing:-.03em}
-.profile-intro p{margin:0;color:#8993a7;font-size:13px}
+.profile-intro h1{font-size:32px;margin:8px 0 6px;letter-spacing:-.03em;overflow-wrap:anywhere}
+.profile-intro p{margin:0;color:#8993a7;font-size:12px}.profile-intro p strong{color:#dfe3ee;font-weight:800;overflow-wrap:anywhere}
 .profile-card{margin-top:22px;background:#121927;border:1px solid #2b3549;border-radius:22px;padding:24px;box-shadow:0 18px 50px #0003}
 .profile-avatar{width:70px;height:70px;border-radius:50%;display:grid;place-items:center;background:#1e2a40;color:#ffc83d;border:1px solid #36425a}
-.profile-status{display:inline-flex;align-items:center;gap:6px;margin-top:14px;color:#ffc83d;font-size:10px;font-weight:900;letter-spacing:.08em}
+.profile-id-sub{display:block;margin-top:4px;color:#737e93;font-size:10px;overflow-wrap:anywhere}
 .profile-info-list{margin-top:22px;border-top:1px solid #293348}
 .profile-info-row{display:flex;align-items:center;gap:14px;padding:17px 0;border-bottom:1px solid #293348}
 .profile-info-icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:#1a2335;color:#ffc83d;flex:none}
