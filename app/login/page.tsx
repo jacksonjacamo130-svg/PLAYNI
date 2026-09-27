@@ -18,6 +18,8 @@ const countries = [
 const logoUrl = "https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png";
 
 export default function LoginPage() {
+  const [fullName, setFullName] = useState("");
+  const [birthDate, setBirthDate] = useState("");
   const [country, setCountry] = useState("NI");
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
@@ -41,6 +43,19 @@ export default function LoginPage() {
     setMessage("");
 
     const digits = phone.replace(/\D/g, "");
+    if (fullName.trim().length < 2) {
+      setError("Escribe tu nombre completo.");
+      return;
+    }
+    if (!birthDate) {
+      setError("Selecciona tu fecha de nacimiento.");
+      return;
+    }
+    const age = new Date().getFullYear() - new Date(birthDate).getFullYear() - (new Date() < new Date(new Date().getFullYear(), new Date(birthDate).getMonth(), new Date(birthDate).getDate()) ? 1 : 0);
+    if (age < 18) {
+      setError("Debes tener al menos 18 años para registrarte en PLAYNI.");
+      return;
+    }
     if (digits.length < 7) {
       setError("Escribe un número de teléfono válido.");
       return;
@@ -51,7 +66,9 @@ export default function LoginPage() {
       phone: fullPhone(),
       options: {
         data: {
-          country_code: selectedCountry.code
+          country_code: selectedCountry.code,
+          full_name: fullName.trim(),
+          birth_date: birthDate
         }
       }
     });
@@ -108,7 +125,7 @@ export default function LoginPage() {
           <h1>{step === "phone" ? "Entra y empieza a ganar" : "Verifica tu número"}</h1>
           <p>
             {step === "phone"
-              ? "Crea tu cuenta o inicia sesión con tu número de teléfono."
+              ? "Regístrate con tu nombre, edad, país y número de teléfono. El número se verifica por SMS."
               : `Escribe el código que enviamos a ${fullPhone()}.`}
           </p>
         </div>
