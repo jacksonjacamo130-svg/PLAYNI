@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Coins, ChevronRight, Clock3, LoaderCircle, Search, ShieldCheck, Sparkles, Gamepad2 } from "lucide-react";
+import { Coins, ChevronRight, Clock3, LoaderCircle, Search, ShieldCheck, Sparkles, Gamepad2, ListChecks } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import BottomNav from "./components/BottomNav";
 import StartOfferButton from "./components/StartOfferButton";
@@ -15,17 +15,20 @@ type PlayOffer = {
 
 export default function HomePage(){
   const [name,setName]=useState("Jugador"), [balance,setBalance]=useState("0.00"),
-    [offers,setOffers]=useState<PlayOffer[]>([]), [loading,setLoading]=useState(true), [query,setQuery]=useState("");
+    [offers,setOffers]=useState<PlayOffer[]>([]), [startedCount,setStartedCount]=useState(0),
+    [loading,setLoading]=useState(true), [query,setQuery]=useState("");
 
   useEffect(()=>{(async()=>{
     const {data:{session}}=await supabase.auth.getSession();
     if(!session){window.location.replace("/login");return;}
-    const [{data:p},{data:w}]=await Promise.all([
+    const [{data:p},{data:w},{count}]=await Promise.all([
       supabase.from("profiles").select("full_name,display_name").eq("id",session.user.id).maybeSingle(),
-      supabase.from("wallets").select("coins").eq("user_id",session.user.id).maybeSingle()
+      supabase.from("wallets").select("coins").eq("user_id",session.user.id).maybeSingle(),
+      supabase.from("user_offers").select("id",{count:"exact",head:true}).eq("user_id",session.user.id).eq("status","active")
     ]);
     setName(p?.full_name?.trim().split(" ")[0]||p?.display_name||"Jugador");
     setBalance(((w?.coins??0)/1000).toFixed(2));
+    setStartedCount(count??0);
     try{
       const res=await fetch("/api/offers",{headers:{Authorization:"Bearer "+session.access_token}});
       const data=await res.json();
@@ -53,6 +56,15 @@ export default function HomePage(){
         <p>Encuentra una oferta, empieza a jugar y gana recompensas.</p>
       </div>
     </section>
+
+    {startedCount > 0 && <section className="active-games-banner">
+      <div className="active-games-icon"><ListChecks size={20}/></div>
+      <div className="active-games-copy">
+        <strong>Tenés {startedCount} {startedCount===1?"juego activo":"juegos activos"}</strong>
+        <span>Seguí tus objetivos y tu progreso.</span>
+      </div>
+      <Link href="/tasks" className="active-games-link">VER MIS JUEGOS <ChevronRight size={16}/></Link>
+    </section>}
 
     <section className="discover-search-section">
       <label className="discover-search">
