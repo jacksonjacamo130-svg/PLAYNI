@@ -2,31 +2,23 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Gamepad2, ChevronRight, Clock3, LoaderCircle } from "lucide-react";
+import { Gamepad2, ChevronRight, Clock3, LoaderCircle, Search, Sparkles } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import BottomNav from "../components/BottomNav";
 
-type Offer = { id:string; title:string; description:string; category:string; icon:string; landingPage:string; tasks:{name:string;reward:number|null}[]; daysLeft:number|null };
+type Offer={id:string;title:string;description:string;category:string;icon:string;landingPage:string;tasks:{name:string;reward:number|null}[];daysLeft:number|null;platform?:string};
 
 export default function GamesPage(){
-  const [offers,setOffers]=useState<Offer[]>([]);
-  const [loading,setLoading]=useState(true);
-  useEffect(()=>{(async()=>{
-    const {data:{session}}=await supabase.auth.getSession();
-    if(!session){window.location.href="/login";return;}
-    try{
-      const res=await fetch("/api/offers",{headers:{Authorization:"Bearer "+session.access_token}});
-      const data=await res.json();
-      setOffers(data.offers??[]);
-    }catch{}
-    setLoading(false);
-  })()},[]);
-  return <main className="app-shell">
-    <header className="topbar"><Link className="back-link" href="/"><ArrowLeft size={19}/></Link><div className="brand"><Gamepad2 size={24}/><span>JUEGOS</span></div><div className="wallet-mini">PLAYNI</div></header>
-    <section className="section" style={{paddingTop:32}}>
-      <div className="section-head"><div><span className="eyebrow">OFERTAS</span><h2>Juega y gana</h2></div></div>
-      {loading?<div className="offers-empty"><LoaderCircle className="spin" size={24}/><span>Cargando ofertas...</span></div>:offers.length?<div className="game-grid">{offers.map(o=><article className="game-card" key={o.id}><div className="game-cover">{o.icon?<img className="game-offer-icon" src={o.icon} alt=""/>:<span className="game-icon">🎮</span>}</div><div className="game-info"><span className="tag">{o.category}</span><h3>{o.title}</h3><p><Clock3 size={14}/>{o.tasks[0]?.name||o.description||"Completa los objetivos"}</p>{o.daysLeft!=null&&<small className="offer-days">{o.daysLeft} días restantes</small>}<a className="offer-link" href={o.landingPage} target="_blank" rel="noreferrer">VER OFERTA <ChevronRight size={16}/></a></div></article>)}</div>:<div className="offers-empty"><strong>Aún no hay ofertas disponibles</strong><span>Las ofertas aparecerán aquí cuando haya campañas disponibles para tu país y dispositivo.</span></div>}
-    </section>
-    <BottomNav />
-  </main>;
+ const [offers,setOffers]=useState<Offer[]>([]),[loading,setLoading]=useState(true),[query,setQuery]=useState("");
+ useEffect(()=>{(async()=>{const {data:{session}}=await supabase.auth.getSession();if(!session){window.location.replace("/login");return;}try{const res=await fetch("/api/offers",{headers:{Authorization:"Bearer "+session.access_token}});const data=await res.json();setOffers(data.offers??[]);}catch{}setLoading(false)})()},[]);
+ const filtered=offers.filter(o=>(o.title+" "+o.category).toLowerCase().includes(query.toLowerCase()));
+ return <main className="app-shell games-premium">
+  <header className="topbar"><Link className="brand" href="/"><img className="brand-logo" src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI"/></Link><div className="games-title"><Gamepad2 size={18}/><span>GANAR</span></div></header>
+  <section className="games-hero"><div><span className="eyebrow"><Sparkles size={13}/> PLAYNI GAMES</span><h1>Juega. Completa.<br/><strong>Gana.</strong></h1><p>Elige una oferta, completa sus objetivos y recibe tus recompensas.</p></div></section>
+  <section className="games-content">
+   <div className="games-toolbar"><div><span className="eyebrow">DISPONIBLES PARA TI</span><h2>Juegos y ofertas</h2></div><label className="games-search"><Search size={16}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar juego"/></label></div>
+   {loading?<div className="games-loading"><LoaderCircle className="spin" size={28}/><span>Buscando ofertas disponibles...</span></div>:filtered.length?<div className="premium-game-grid">{filtered.map(o=><article className="premium-game" key={o.id}><div className="premium-cover">{o.icon?<img src={o.icon} alt=""/>:<div className="cover-placeholder"><Gamepad2 size={48}/></div>}<span className="premium-badge">{o.category}</span></div><div className="premium-body"><div className="premium-title"><h3>{o.title}</h3><span className="premium-earn">{o.tasks.filter(t=>t.reward!=null).reduce((a,t)=>a+(t.reward??0),0)>0?("+"+o.tasks.reduce((a,t)=>a+(t.reward??0),0)+" coins"):"RECOMPENSAS"}</span></div><p>{o.description||"Completa objetivos dentro del juego para recibir recompensas."}</p><div className="premium-meta"><span><Clock3 size={14}/>{o.daysLeft!=null?o.daysLeft+" días":"Tiempo limitado"}</span><span>{o.tasks.length||1} objetivos</span></div><a className="premium-cta" href={o.landingPage} target="_blank" rel="noreferrer">EMPEZAR A JUGAR <ChevronRight size={17}/></a></div></article>)}</div>:<div className="no-real-offers"><div className="no-offers-icon"><Gamepad2 size={34}/></div><h2>Estamos preparando tus juegos</h2><p>Las ofertas reales aparecerán aquí cuando haya campañas disponibles para Nicaragua y tu dispositivo.</p><span>No mostramos juegos falsos ni recompensas inventadas.</span></div>}
+  </section>
+  <BottomNav/>
+ </main>;
 }
