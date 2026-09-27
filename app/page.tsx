@@ -65,11 +65,6 @@ export default function HomePage(){
         <span className="discover-count">{offers.length} disponibles</span>
       </div>
 
-      <label className="discover-search">
-        <Search size={18}/>
-        <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar juegos y ofertas"/>
-      </label>
-
       {loading ? <div className="discover-loading"><LoaderCircle className="spin" size={25}/><span>Buscando ofertas disponibles...</span></div> :
       filtered.length ? <div className="discover-grid">{filtered.map(o=><article className="discover-card" key={o.id}>
         <div className="discover-cover">
