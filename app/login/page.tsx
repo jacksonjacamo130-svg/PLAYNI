@@ -27,6 +27,21 @@ export default function LoginPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("reset") === "1") setMode("reset");
+
+    const hasOAuthReturn = window.location.hash.includes("access_token") || params.has("code");
+    if (!hasOAuthReturn) return;
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
+        window.location.replace("/");
+      }
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) window.location.replace("/");
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   async function submit(event: FormEvent) {
@@ -81,7 +96,10 @@ export default function LoginPage() {
   async function signInWithGoogle() {
     setLoading(true); setError(""); setMessage("");
     const { error: googleError } = await supabase.auth.signInWithOAuth({
-      provider: "google"
+      provider: "google",
+      options: {
+        redirectTo: PLAYNI_URL + "/login"
+      }
     });
     if (googleError) {
       setLoading(false);
