@@ -19,7 +19,7 @@ export default function LoginPage() {
   const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedLegal, setAcceptedLegal] = useState(false);
-  const [loading, setLoading] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
+  const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
   const selectedCountry = useMemo(() => countries.find((item) => item.code === country) ?? countries[0], [country]);
   const fullPhone = () => selectedCountry.dial + phone.replace(/\D/g, "");
 
@@ -94,15 +94,12 @@ export default function LoginPage() {
   }
 
   async function signInWithGoogle() {
-    setLoading(true); setError(""); setMessage("");
+    setGoogleLoading(true); setError(""); setMessage("");
     const { error: googleError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: PLAYNI_URL + "/login"
-      }
+      provider: "google"
     });
     if (googleError) {
-      setLoading(false);
+      setGoogleLoading(false);
       return setError("No pudimos iniciar sesión con Google. Inténtalo de nuevo.");
     }
   }
@@ -121,46 +118,46 @@ export default function LoginPage() {
         </div>}
         <form onSubmit={submit} className="auth-form">
           {mode === "register" && <>
-            <label htmlFor="fullName">Nombre completo</label><input id="fullName" autoComplete="name" placeholder="Tu nombre completo" value={fullName} onChange={(e) => setFullName(e.target.value)} disabled={loading} />
-            <label htmlFor="birthDate">Fecha de nacimiento</label><input id="birthDate" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} disabled={loading} />
-            <label htmlFor="gender">Género</label><select id="gender" value={gender} onChange={(e) => setGender(e.target.value)} disabled={loading}>
+            <label htmlFor="fullName">Nombre completo</label><input id="fullName" autoComplete="name" placeholder="Tu nombre completo" value={fullName} onChange={(e) => setFullName(e.target.value)} disabled={loading || googleLoading} />
+            <label htmlFor="birthDate">Fecha de nacimiento</label><input id="birthDate" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} disabled={loading || googleLoading} />
+            <label htmlFor="gender">Género</label><select id="gender" value={gender} onChange={(e) => setGender(e.target.value)} disabled={loading || googleLoading}>
               <option value="">Selecciona una opción</option>
               <option value="male">Hombre</option>
               <option value="female">Mujer</option>
               <option value="other">Otro</option>
             </select>
-            <label htmlFor="country">País</label><select id="country" value={country} onChange={(e) => setCountry(e.target.value)} disabled={loading}>{countries.map((item) => <option key={item.code} value={item.code}>{item.name} ({item.dial})</option>)}</select>
-            <label htmlFor="phone">Número de teléfono</label><div className="phone-field"><span>{selectedCountry.dial}</span><input id="phone" inputMode="numeric" autoComplete="tel" placeholder="8888 8888" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={loading} /></div>
+            <label htmlFor="country">País</label><select id="country" value={country} onChange={(e) => setCountry(e.target.value)} disabled={loading || googleLoading}>{countries.map((item) => <option key={item.code} value={item.code}>{item.name} ({item.dial})</option>)}</select>
+            <label htmlFor="phone">Número de teléfono</label><div className="phone-field"><span>{selectedCountry.dial}</span><input id="phone" inputMode="numeric" autoComplete="tel" placeholder="8888 8888" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={loading || googleLoading} /></div>
           </>}
-          <label htmlFor="email">Correo electrónico</label><input id="email" type="email" autoComplete="email" placeholder="tu@correo.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading || mode === "reset"} />
+          <label htmlFor="email">Correo electrónico</label><input id="email" type="email" autoComplete="email" placeholder="tu@correo.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading || googleLoading || mode === "reset"} />
           <label htmlFor="password">Contraseña</label>
           <div className="password-field">
-            <input id="password" type={showPassword ? "text" : "password"} autoComplete={mode === "login" ? "current-password" : "new-password"} placeholder="Mínimo 6 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} />
-            <button type="button" className="password-toggle" aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"} onClick={() => setShowPassword((value) => !value)} disabled={loading}>
+            <input id="password" type={showPassword ? "text" : "password"} autoComplete={mode === "login" ? "current-password" : "new-password"} placeholder="Mínimo 6 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading || googleLoading} />
+            <button type="button" className="password-toggle" aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"} onClick={() => setShowPassword((value) => !value)} disabled={loading || googleLoading}>
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
           {(mode === "register" || mode === "reset") && <>
             <label htmlFor="confirmPassword">Confirmar contraseña</label>
             <div className="password-field">
-              <input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} autoComplete="new-password" placeholder="Repite tu contraseña" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={loading} />
-              <button type="button" className="password-toggle" aria-label={showConfirmPassword ? "Ocultar confirmación de contraseña" : "Mostrar confirmación de contraseña"} onClick={() => setShowConfirmPassword((value) => !value)} disabled={loading}>
+              <input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} autoComplete="new-password" placeholder="Repite tu contraseña" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={loading || googleLoading} />
+              <button type="button" className="password-toggle" aria-label={showConfirmPassword ? "Ocultar confirmación de contraseña" : "Mostrar confirmación de contraseña"} onClick={() => setShowConfirmPassword((value) => !value)} disabled={loading || googleLoading}>
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
           </>}
-          {mode === "register" && <label className="legal-consent"><input type="checkbox" checked={acceptedLegal} onChange={(e) => setAcceptedLegal(e.target.checked)} disabled={loading} /><span>Acepto los <a href="/terminos">Términos y Condiciones</a> y la <a href="/privacidad">Política de Privacidad</a> de PLAYNI.</span></label>}
-          <button className="auth-button" type="submit" disabled={loading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : mode === "reset" ? "CAMBIAR CONTRASEÑA" : "CREAR CUENTA"}</button>
+          {mode === "register" && <label className="legal-consent"><input type="checkbox" checked={acceptedLegal} onChange={(e) => setAcceptedLegal(e.target.checked)} disabled={loading || googleLoading} /><span>Acepto los <a href="/terminos">Términos y Condiciones</a> y la <a href="/privacidad">Política de Privacidad</a> de PLAYNI.</span></label>}
+          <button className="auth-button" type="submit" disabled={loading || googleLoading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : mode === "reset" ? "CAMBIAR CONTRASEÑA" : "CREAR CUENTA"}</button>
           {mode === "login" && <>
             <div className="auth-divider"><span>o</span></div>
-            <button type="button" className="google-button" onClick={signInWithGoogle} disabled={loading}>
-              <svg className="google-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <button type="button" className="google-button" onClick={signInWithGoogle} disabled={loading || googleLoading}>
+              {googleLoading ? <Loader2 className="spin" size={19} /> : <svg className="google-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path fill="#4285F4" d="M21.35 12.27c0-.68-.06-1.33-.17-1.95H12v3.69h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.7 2.91-4.2 2.91-7.13Z"/>
                 <path fill="#34A853" d="M12 21.73c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.55 0-4.71-1.72-5.49-4.03H3.27v2.53A9.74 9.74 0 0 0 12 21.73Z"/>
                 <path fill="#FBBC05" d="M6.51 13.81A5.86 5.86 0 0 1 6.2 12c0-.63.11-1.25.31-1.81V7.66H3.27A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.05 1.02 4.34l3.24-2.53Z"/>
                 <path fill="#EA4335" d="M12 6.16c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.83 3.23 14.63 2.27 12 2.27a9.74 9.74 0 0 0-8.73 5.39l3.24 2.53c.78-2.31 2.94-4.03 5.49-4.03Z"/>
-              </svg>
-              CONTINUAR CON GOOGLE
+              </svg>}
+              {googleLoading ? "CONECTANDO CON GOOGLE..." : "CONTINUAR CON GOOGLE"}
             </button>
           </>}
         {mode === "login" && <button type="button" className="auth-link-button" onClick={async () => {
