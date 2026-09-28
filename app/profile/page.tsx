@@ -18,13 +18,16 @@ export default function ProfilePage(){
   const [country,setCountry]=useState("No especificado");
   const [birthDate,setBirthDate]=useState("No especificada");
   const [gender,setGender]=useState("No especificado");
-  const [userId,setUserId]=useState("");\n  const [isAdmin,setIsAdmin]=useState(false);
+  const [userId,setUserId]=useState("");
+  const [isAdmin,setIsAdmin]=useState(false);
 
   useEffect(()=>{(async()=>{
     const {data:{user}}=await supabase.auth.getUser();
     if(!user){window.location.href="/login";return;}
     setEmail(user.email??"");
     setUserId(user.id);
+    const {data:adminRow}=await supabase.from("admin_users").select("user_id").eq("user_id",user.id).maybeSingle();
+    setIsAdmin(!!adminRow);
     const {data}=await supabase.from("profiles").select("full_name,display_name,country_code,birth_date,gender").eq("id",user.id).maybeSingle();
     setName(data?.full_name?.trim()||data?.display_name||"Jugador");
     const code=(data?.country_code??"").toUpperCase();
@@ -67,6 +70,7 @@ export default function ProfilePage(){
       <section className="profile-section">
         <div className="profile-section-title"><Settings2 size={17}/><span>CUENTA Y SEGURIDAD</span></div>
         <div className="profile-menu-card">
+          {isAdmin && <Link href="/admin" className="profile-menu-row profile-menu-link"><div className="profile-menu-icon"><ShieldCheck size={18}/></div><div><strong>Panel de administración</strong><span>Gestiona PLAYNI, ofertas y retiros</span></div><ChevronRight size={17}/></Link>}
           <button type="button" className="profile-menu-row profile-notifications-link" onClick={()=>{window.location.href="/profile/notifications";}}><div className="profile-menu-icon"><Bell size={18}/></div><div><strong>Notificaciones</strong><span>Preferencias de avisos de PLAYNI</span></div><ChevronRight size={17}/></button>
           <Link href="/profile/password" className="profile-menu-row profile-menu-link"><div className="profile-menu-icon"><KeyRound size={18}/></div><div><strong>Contraseña</strong><span>Cambia la contraseña de tu cuenta</span></div><ChevronRight size={17}/></Link>
         </div>
