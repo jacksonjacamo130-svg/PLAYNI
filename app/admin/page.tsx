@@ -71,7 +71,7 @@ export default function AdminPage(){
     <header className="admin-topbar"><Link href="/" className="admin-back"><ArrowLeft size={18}/></Link><div className="admin-brand"><img src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI"/><span>PLAYNI</span></div><span className="admin-secure"><ShieldCheck size={15}/> ADMINISTRADOR</span></header>
     <section className="admin-content">
       <div className="admin-heading"><div><span className="eyebrow">CENTRO DE CONTROL</span><h1>Panel de administración</h1><p>Gestiona usuarios, ofertas y retiros desde un solo lugar.</p></div></div>
-      {error&&<div className="admin-alert"><XCircle size={17}/> ${error}</div>}
+      {error&&<div className="admin-alert"><XCircle size={17}/> {error}</div>}
       <div className="admin-stat-grid">
         <div className="admin-stat"><span><Users size={16}/></span><div><small>Usuarios</small><strong>{profiles.length}</strong></div></div>
         <div className="admin-stat"><span><Gamepad2 size={16}/></span><div><small>Ofertas activas</small><strong>{activeOffers}</strong></div></div>
