@@ -68,7 +68,7 @@ export default function AdminPage(){
   const tabs:[Tab,string][]=[["overview","Resumen"],["users","Usuarios"],["offers","Ofertas"],["withdrawals","Retiros"],["conversions","Conversiones"]];
 
   return <main className="admin-page">
-    <header className="admin-topbar"><Link href="/" className="admin-back"><ArrowLeft size={18}/></Link><div className="admin-brand"><img src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI"/><span>PLAYNI</span></div><span className="admin-secure"><ShieldCheck size={15}/> ADMINISTRADOR</span></header>
+    <header className="admin-topbar"><Link href="/" className="admin-back"><ArrowLeft size={18}/></Link><div className="admin-brand"><img src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI"/></div><span className="admin-secure"><ShieldCheck size={15}/> ADMINISTRADOR</span></header>
     <section className="admin-content">
       <div className="admin-heading"><div><span className="eyebrow">CENTRO DE CONTROL</span><h1>Panel de administración</h1><p>Gestiona usuarios, ofertas y retiros desde un solo lugar.</p></div></div>
       {error&&<div className="admin-alert"><XCircle size={17}/> {error}</div>}
