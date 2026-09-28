@@ -11,6 +11,7 @@ const countries = [
   { code: "MX", name: "México", dial: "+52" }, { code: "US", name: "Estados Unidos", dial: "+1" }
 ];
 const logoUrl = "https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png";
+const PLAYNI_URL = "https://playni-app.vercel.app";
 
 export default function LoginPage() {
   const [mode, setMode] = useState<"login" | "register" | "reset">("login");
@@ -66,7 +67,7 @@ export default function LoginPage() {
 
     const { data, error: signUpError } = await supabase.auth.signUp({
       email: email.trim(), password,
-      options: { emailRedirectTo: window.location.origin + "/login?confirmed=1", data: { full_name: fullName.trim(), birth_date: birthDate, gender, country_code: selectedCountry.code, phone_e164: fullPhone(), phone_verified: false } }
+      options: { emailRedirectTo: PLAYNI_URL + "/login?confirmed=1", data: { full_name: fullName.trim(), birth_date: birthDate, gender, country_code: selectedCountry.code, phone_e164: fullPhone(), phone_verified: false } }
     });
     setLoading(false);
     if (signUpError) return setError(signUpError.message);
@@ -121,7 +122,7 @@ export default function LoginPage() {
         {mode === "login" && <button type="button" className="auth-link-button" onClick={async () => {
           if (!email.trim() || !email.includes("@")) return setError("Escribe primero tu correo electrónico.");
           setLoading(true); setError(""); setMessage("");
-          const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin + "/login?reset=1" });
+          const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: PLAYNI_URL + "/login?reset=1" });
           setLoading(false);
           if (resetError) return setError("No pudimos enviar el enlace de recuperación. Inténtalo de nuevo.");
           setMessage("Te enviamos un enlace para cambiar tu contraseña. Revisa tu correo y la carpeta de spam.");
