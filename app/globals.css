@@ -31,7 +31,7 @@ button,a{font:inherit}
   .game-grid{grid-template-columns:repeat(2,1fr)}
   .how{padding:0 28px}.steps{grid-template-columns:repeat(2,1fr)}
 }
-@media(max-width:800px){
+@media(max-width:800px), (pointer:coarse){
   .brand-logo{width:76px;height:76px}
   .app-shell{padding-bottom:84px}
   .topbar{height:64px;padding:0 14px;position:sticky}
