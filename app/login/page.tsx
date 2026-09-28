@@ -78,6 +78,17 @@ export default function LoginPage() {
     setMode("login");
   }
 
+  async function signInWithGoogle() {
+    setLoading(true); setError(""); setMessage("");
+    const { error: googleError } = await supabase.auth.signInWithOAuth({
+      provider: "google"
+    });
+    if (googleError) {
+      setLoading(false);
+      return setError("No pudimos iniciar sesión con Google. Inténtalo de nuevo.");
+    }
+  }
+
   return (
     <main className="auth-page">
       <section className="auth-card">
@@ -122,6 +133,18 @@ export default function LoginPage() {
           </>}
           {mode === "register" && <label className="legal-consent"><input type="checkbox" checked={acceptedLegal} onChange={(e) => setAcceptedLegal(e.target.checked)} disabled={loading} /><span>Acepto los <a href="/terminos">Términos y Condiciones</a> y la <a href="/privacidad">Política de Privacidad</a> de PLAYNI.</span></label>}
           <button className="auth-button" type="submit" disabled={loading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : mode === "reset" ? "CAMBIAR CONTRASEÑA" : "CREAR CUENTA"}</button>
+          {mode === "login" && <>
+            <div className="auth-divider"><span>o</span></div>
+            <button type="button" className="google-button" onClick={signInWithGoogle} disabled={loading}>
+              <svg className="google-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#4285F4" d="M21.35 12.27c0-.68-.06-1.33-.17-1.95H12v3.69h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.7 2.91-4.2 2.91-7.13Z"/>
+                <path fill="#34A853" d="M12 21.73c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.55 0-4.71-1.72-5.49-4.03H3.27v2.53A9.74 9.74 0 0 0 12 21.73Z"/>
+                <path fill="#FBBC05" d="M6.51 13.81A5.86 5.86 0 0 1 6.2 12c0-.63.11-1.25.31-1.81V7.66H3.27A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.05 1.02 4.34l3.24-2.53Z"/>
+                <path fill="#EA4335" d="M12 6.16c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.83 3.23 14.63 2.27 12 2.27a9.74 9.74 0 0 0-8.73 5.39l3.24 2.53c.78-2.31 2.94-4.03 5.49-4.03Z"/>
+              </svg>
+              CONTINUAR CON GOOGLE
+            </button>
+          </>}
         {mode === "login" && <button type="button" className="auth-link-button" onClick={async () => {
           if (!email.trim() || !email.includes("@")) return setError("Escribe primero tu correo electrónico.");
           setLoading(true); setError(""); setMessage("");
