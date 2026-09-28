@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { UserCircle2, LogOut, Mail, MapPin, UserRound, Bell, KeyRound, Settings2, ChevronRight, Clock3 } from "lucide-react";
+import { UserCircle2, LogOut, Mail, MapPin, UserRound, Bell, KeyRound, Settings2, ChevronRight, Clock3, ShieldCheck } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import BottomNav from "../components/BottomNav";
 
@@ -18,7 +18,7 @@ export default function ProfilePage(){
   const [country,setCountry]=useState("No especificado");
   const [birthDate,setBirthDate]=useState("No especificada");
   const [gender,setGender]=useState("No especificado");
-  const [userId,setUserId]=useState("");
+  const [userId,setUserId]=useState("");\n  const [isAdmin,setIsAdmin]=useState(false);
 
   useEffect(()=>{(async()=>{
     const {data:{user}}=await supabase.auth.getUser();
