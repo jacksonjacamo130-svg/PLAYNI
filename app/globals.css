@@ -457,3 +457,28 @@ button,a{font:inherit}
 .admin-brand strong{display:none}
 @media(max-width:800px){.admin-topbar{height:64px;padding:0 14px;gap:11px}.admin-brand{height:64px}.admin-brand img{width:50px;height:50px;max-width:50px;max-height:50px}}
 @media(max-width:360px){.admin-brand img{width:48px;height:48px;max-width:48px;max-height:48px}}
+
+
+/* PLAYNI — Legal documents */
+.legal-page{min-height:100vh;background:#090d16;color:#f7f8fb;padding-bottom:60px}
+.legal-topbar{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #20283a;background:#0b0f1a;position:sticky;top:0;z-index:20}
+.legal-back{display:inline-flex;align-items:center;gap:7px;color:#9ea7b9;text-decoration:none;font-size:11px;font-weight:900}
+.legal-back:hover{color:#ffc83d}
+.legal-brand{display:flex;align-items:center;text-decoration:none}.legal-brand img{width:58px;height:58px;object-fit:contain;display:block}
+.legal-card{width:min(900px,calc(100% - 32px));margin:28px auto 0;padding:30px 32px 36px;background:#111827;border:1px solid #293246;border-radius:20px;box-shadow:0 22px 70px #0004}
+.legal-kicker{display:inline-flex;align-items:center;gap:7px;color:#ffc83d;font-size:9px;font-weight:900;letter-spacing:.16em}
+.legal-card h1{font-size:clamp(30px,5vw,44px);line-height:1.03;letter-spacing:-.045em;margin:10px 0 7px}
+.legal-updated{margin:0 0 30px;color:#727d91;font-size:11px}
+.legal-card section{margin-top:25px;padding-top:25px;border-top:1px solid #232d40}
+.legal-card h2{font-size:17px;line-height:1.2;margin:0 0 9px;color:#f3f5fa}
+.legal-card p,.legal-card li{color:#a5adbc;font-size:12px;line-height:1.72}
+.legal-card p{margin:0 0 10px}.legal-card p:last-child{margin-bottom:0}
+.legal-card ul{margin:8px 0 0;padding-left:20px}.legal-card li{margin:7px 0}
+.legal-footer-links{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:30px;padding-top:20px;border-top:1px solid #293246}
+.legal-footer-links a{color:#ffc83d;text-decoration:none;font-size:11px;font-weight:900}.legal-footer-links a:hover{text-decoration:underline}
+.auth-legal-links{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin-top:18px;color:#667188;font-size:10px}
+.auth-legal-links a{color:#9ea7b8;text-decoration:none}.auth-legal-links a:hover{color:#ffc83d}
+.legal-consent{display:flex!important;align-items:flex-start;gap:9px;margin:9px 0 2px!important;padding:11px 12px;border:1px solid #2b3548;background:#101725;border-radius:12px;color:#8f99ac!important;font-size:10px!important;line-height:1.5;font-weight:500!important}
+.legal-consent input{width:16px!important;height:16px!important;flex:0 0 16px!important;margin:1px 0 0!important;accent-color:#ffc83d}
+.legal-consent span{display:block}.legal-consent a{color:#ffc83d;text-decoration:none;font-weight:800}.legal-consent a:hover{text-decoration:underline}
+@media(max-width:700px){.legal-card{width:calc(100% - 20px);padding:24px 18px 28px;border-radius:17px}.legal-card h2{font-size:16px}.legal-card p,.legal-card li{font-size:11px;line-height:1.68}.legal-brand img{width:50px;height:50px}.legal-topbar{padding:0 12px}}
