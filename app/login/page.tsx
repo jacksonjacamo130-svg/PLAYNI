@@ -17,7 +17,7 @@ export default function LoginPage() {
   const [mode, setMode] = useState<"login" | "register" | "reset">("login");
   const [fullName, setFullName] = useState(""), [birthDate, setBirthDate] = useState(""), [gender, setGender] = useState(""), [country, setCountry] = useState("NI");
   const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);\n  const [acceptedLegal, setAcceptedLegal] = useState(false);
   const [loading, setLoading] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
   const selectedCountry = useMemo(() => countries.find((item) => item.code === country) ?? countries[0], [country]);
   const fullPhone = () => selectedCountry.dial + phone.replace(/\D/g, "");
