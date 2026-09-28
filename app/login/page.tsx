@@ -17,7 +17,8 @@ export default function LoginPage() {
   const [mode, setMode] = useState<"login" | "register" | "reset">("login");
   const [fullName, setFullName] = useState(""), [birthDate, setBirthDate] = useState(""), [gender, setGender] = useState(""), [country, setCountry] = useState("NI");
   const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);\n  const [acceptedLegal, setAcceptedLegal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptedLegal, setAcceptedLegal] = useState(false);
   const [loading, setLoading] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
   const selectedCountry = useMemo(() => countries.find((item) => item.code === country) ?? countries[0], [country]);
   const fullPhone = () => selectedCountry.dial + phone.replace(/\D/g, "");
@@ -54,6 +55,7 @@ export default function LoginPage() {
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
       if (age < 18) return setError("Debes tener al menos 18 años para registrarte en PLAYNI.");
       if (phone.replace(/\D/g, "").length < 7) return setError("El teléfono es obligatorio para crear la cuenta.");
+      if (!acceptedLegal) return setError("Debes aceptar los Términos y Condiciones y la Política de Privacidad para crear tu cuenta.");
     }
 
     setLoading(true);
@@ -118,6 +120,7 @@ export default function LoginPage() {
               </button>
             </div>
           </>}
+          {mode === "register" && <label className="legal-consent"><input type="checkbox" checked={acceptedLegal} onChange={(e) => setAcceptedLegal(e.target.checked)} disabled={loading} /><span>Acepto los <a href="/terminos">Términos y Condiciones</a> y la <a href="/privacidad">Política de Privacidad</a> de PLAYNI.</span></label>}
           <button className="auth-button" type="submit" disabled={loading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : mode === "reset" ? "CAMBIAR CONTRASEÑA" : "CREAR CUENTA"}</button>
         {mode === "login" && <button type="button" className="auth-link-button" onClick={async () => {
           if (!email.trim() || !email.includes("@")) return setError("Escribe primero tu correo electrónico.");
