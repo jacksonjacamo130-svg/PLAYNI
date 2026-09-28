@@ -18,7 +18,14 @@ export default function HomePage(){
     [offers,setOffers]=useState<PlayOffer[]>([]), [startedCount,setStartedCount]=useState(0),
     [loading,setLoading]=useState(true), [query,setQuery]=useState("");
 
-  useEffect(()=>{(async()=>{
+  useEffect(()=>{
+    const oauthReturn = new URLSearchParams(window.location.search).get("oauth_return");
+    if (oauthReturn === "google") {
+      window.history.replaceState({}, "", "/");
+      window.location.reload();
+      return;
+    }
+    (async()=>{
     const {data:{session}}=await supabase.auth.getSession();
     if(!session){window.location.replace("/login");return;}
     const [{data:p},{data:w},{count}]=await Promise.all([
