@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { UserCircle2, LogOut, Mail, MapPin, UserRound, Bell, KeyRound, Settings2, ChevronRight, Clock3, ShieldCheck } from "lucide-react";
+import { UserCircle2, LogOut, Mail, MapPin, UserRound, Bell, KeyRound, Settings2, ChevronRight, Clock3, ShieldCheck, FileText, LockKeyhole } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import BottomNav from "../components/BottomNav";
 
@@ -75,6 +75,15 @@ export default function ProfilePage(){
           <Link href="/profile/password" className="profile-menu-row profile-menu-link"><div className="profile-menu-icon"><KeyRound size={18}/></div><div><strong>Contraseña</strong><span>Cambia la contraseña de tu cuenta</span></div><ChevronRight size={17}/></Link>
         </div>
       </section>
+
+      <section className="profile-section">
+        <div className="profile-section-title"><LockKeyhole size={17}/><span>LEGAL Y PRIVACIDAD</span></div>
+        <div className="profile-menu-card">
+          <Link href="/terminos" className="profile-menu-row profile-menu-link"><div className="profile-menu-icon"><FileText size={18}/></div><div><strong>Términos y condiciones</strong><span>Reglas de uso, ofertas, recompensas y seguridad</span></div><ChevronRight size={17}/></Link>
+          <Link href="/privacidad" className="profile-menu-row profile-menu-link"><div className="profile-menu-icon"><LockKeyhole size={18}/></div><div><strong>Política de privacidad</strong><span>Cómo usamos y protegemos tus datos</span></div><ChevronRight size={17}/></Link>
+        </div>
+      </section>
+
       <button className="profile-logout" onClick={logout}><LogOut size={17}/> CERRAR SESIÓN</button>
     </section>
     <BottomNav />
