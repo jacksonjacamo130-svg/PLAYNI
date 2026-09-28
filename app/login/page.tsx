@@ -135,6 +135,7 @@ export default function LoginPage() {
         {message && <div className="auth-message success"><CheckCircle2 size={18} /> {message}</div>}
         {error && <div className="auth-message error">{error}</div>}
         <div className="auth-security"><ShieldCheck size={19} /><span>Tu teléfono se guarda como dato de seguridad, pero no se utiliza para iniciar sesión.</span></div>
+        <div className="auth-legal-links"><a href="/terminos">Términos y Condiciones</a><span>•</span><a href="/privacidad">Política de Privacidad</a></div>
       </section>
     </main>
   );
