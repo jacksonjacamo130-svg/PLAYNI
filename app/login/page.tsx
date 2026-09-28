@@ -33,7 +33,7 @@ export default function LoginPage() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
-        window.location.replace("/");
+        window.location.replace("/?oauth_return=google");
       }
     });
 
