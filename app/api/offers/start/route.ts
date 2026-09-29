@@ -41,11 +41,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "INVALID_BODY" }, { status: 400 });
   }
 
-  const provider = String(body.provider ?? "ayet").trim();
+  const provider = String(body.provider ?? "").trim();
   const externalOfferId = String(body.externalOfferId ?? "").trim();
   const title = String(body.title ?? "Oferta").trim();
   const landingUrl = String(body.landingUrl ?? "").trim();
 
+  if (!provider) return NextResponse.json({ error: "PROVIDER_REQUIRED" }, { status: 400 });
   if (!externalOfferId || !landingUrl) {
     return NextResponse.json({ error: "OFFER_DATA_REQUIRED" }, { status: 400 });
   }
@@ -99,8 +100,10 @@ export async function POST(request: NextRequest) {
         .eq("provider", provider)
         .eq("external_offer_id", externalOfferId)
         .maybeSingle();
+
       if (raceExisting) return NextResponse.json({ ok: true, alreadyStarted: true, userOfferId: raceExisting.id });
     }
+
     return NextResponse.json({ error: "START_FAILED" }, { status: 500 });
   }
 
