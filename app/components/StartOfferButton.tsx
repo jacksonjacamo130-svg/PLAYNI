@@ -30,7 +30,7 @@ function downloadLabel(url: string, platform?: string) {
 }
 
 export default function StartOfferButton({
-  provider = "ayet",
+  provider,
   offerId,
   title,
   description = "",
@@ -48,6 +48,11 @@ export default function StartOfferButton({
 
   async function startOffer() {
     if (starting) return;
+    if (!provider) {
+      window.alert("Esta oferta no está disponible en este momento.");
+      return;
+    }
+
     setStarting(true);
 
     const { data: { session } } = await supabase.auth.getSession();
@@ -78,9 +83,7 @@ export default function StartOfferButton({
         })
       });
 
-      if (!response.ok) {
-        throw new Error("start_failed");
-      }
+      if (!response.ok) throw new Error("start_failed");
 
       window.location.assign(landingUrl);
     } catch {
