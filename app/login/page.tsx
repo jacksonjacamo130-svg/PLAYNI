@@ -19,7 +19,7 @@ export default function LoginPage() {
   const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedLegal, setAcceptedLegal] = useState(false);
-  const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
+  const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [confirmingEmail, setConfirmingEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("confirmed") === "1"), [message, setMessage] = useState(""), [error, setError] = useState("");
   const selectedCountry = useMemo(() => countries.find((item) => item.code === country) ?? countries[0], [country]);
   const fullPhone = () => selectedCountry.dial + phone.replace(/\D/g, "");
 
@@ -27,6 +27,35 @@ export default function LoginPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("reset") === "1") setMode("reset");
+
+    const isEmailConfirmation = params.get("confirmed") === "1";
+    if (isEmailConfirmation) {
+      let cancelled = false;
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (!cancelled && session && event !== "SIGNED_OUT") {
+          window.location.replace("/");
+        }
+      });
+
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (cancelled) return;
+        if (session) {
+          window.location.replace("/");
+          return;
+        }
+        setTimeout(() => {
+          if (cancelled) return;
+          setConfirmingEmail(false);
+          setMessage("Correo confirmado correctamente. Ya puedes iniciar sesión.");
+          window.history.replaceState({}, "", "/login");
+        }, 1200);
+      });
+
+      return () => {
+        cancelled = true;
+        subscription.unsubscribe();
+      };
+    }
 
     const hasOAuthReturn = window.location.hash.includes("access_token") || params.has("code");
     if (!hasOAuthReturn) return;
@@ -104,6 +133,21 @@ export default function LoginPage() {
       setGoogleLoading(false);
       return setError("No pudimos iniciar sesión con Google. Inténtalo de nuevo.");
     }
+  }
+
+  if (confirmingEmail) {
+    return (
+      <main className="auth-page">
+        <section className="auth-card">
+          <div className="auth-logo-wrap"><img className="auth-logo" src={logoUrl} alt="PLAYNI" /></div>
+          <div className="auth-heading">
+            <h1>Cuenta confirmada</h1>
+            <p>Estamos activando tu acceso. Un momento...</p>
+          </div>
+          <div style={{display:"flex",justifyContent:"center",paddingTop:10}}><Loader2 className="spin" size={24} /></div>
+        </section>
+      </main>
+    );
   }
 
   return (
