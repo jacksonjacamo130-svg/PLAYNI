@@ -11,7 +11,7 @@ const countries = [
   { code: "MX", name: "México", dial: "+52" }, { code: "US", name: "Estados Unidos", dial: "+1" }
 ];
 const logoUrl = "https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png";
-const PLAYNI_URL = "https://playni-app.vercel.app";
+const PLAYNI_URL = "https://playniapp.site";
 
 export default function LoginPage() {
   const [mode, setMode] = useState<"login" | "register" | "reset">("login");
@@ -97,7 +97,8 @@ export default function LoginPage() {
     setGoogleLoading(true); setError(""); setMessage("");
     try { window.sessionStorage.setItem("playni_google_pending", "1"); } catch {}
     const { error: googleError } = await supabase.auth.signInWithOAuth({
-      provider: "google"
+      provider: "google",
+      options: { redirectTo: window.location.origin + "/login" }
     });
     if (googleError) {
       setGoogleLoading(false);
