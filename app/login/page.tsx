@@ -113,7 +113,7 @@ export default function LoginPage() {
 
     const { data, error: signUpError } = await supabase.auth.signUp({
       email: email.trim(), password,
-      options: { emailRedirectTo: PLAYNI_URL + "/login?confirmed=1", data: { full_name: fullName.trim(), birth_date: birthDate, gender, country_code: selectedCountry.code, phone_e164: fullPhone(), phone_verified: false } }
+      options: { emailRedirectTo: PLAYNI_URL, data: { full_name: fullName.trim(), birth_date: birthDate, gender, country_code: selectedCountry.code, phone_e164: fullPhone(), phone_verified: false } }
     });
     setLoading(false);
     if (signUpError) return setError(signUpError.message);
