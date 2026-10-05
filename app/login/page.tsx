@@ -1,8 +1,7 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Script from "next/script";
 import { CheckCircle2, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
@@ -36,7 +35,7 @@ export default function LoginPage() {
   const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedLegal, setAcceptedLegal] = useState(false);
-  const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [googleButtonReady, setGoogleButtonReady] = useState(false), [confirmingEmail, setConfirmingEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("confirmed") === "1"), [googleScriptReady, setGoogleScriptReady] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
+  const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [googleButtonReady, setGoogleButtonReady] = useState(false), [confirmingEmail, setConfirmingEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("confirmed") === "1"), [message, setMessage] = useState(""), [error, setError] = useState("");
   const googleButtonRef = useRef<HTMLDivElement>(null);
   const googleNonceRef = useRef<string | null>(null);
   const googleIdentityInitializedRef = useRef(false);
@@ -132,15 +131,27 @@ export default function LoginPage() {
     setMode("login");
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (mode !== "login") {
       googleIdentityInitializedRef.current = false;
       return;
     }
-    if (googleScriptReady && !googleIdentityInitializedRef.current) {
+    if (window.google && !googleIdentityInitializedRef.current) {
       void prepareGoogleIdentity();
+      return;
     }
-  }, [mode, googleScriptReady]);
+
+    let attempts = 0;
+    const retry = () => {
+      if (mode !== "login" || googleIdentityInitializedRef.current) return;
+      if (window.google) {
+        void prepareGoogleIdentity();
+        return;
+      }
+      if (attempts++ < 20) window.setTimeout(retry, 50);
+    };
+    retry();
+  }, [mode]);
 
   async function prepareGoogleIdentity() {
     if (!window.google || !googleButtonRef.current || googleIdentityInitializedRef.current) return;
@@ -163,27 +174,20 @@ export default function LoginPage() {
           setMessage("");
 
           const nonce = googleNonceRef.current;
-          const { data, error: googleError } = await supabase.auth.signInWithIdToken({
+          // Start Supabase authentication immediately, then leave the login route.
+          // The home route waits briefly for the persisted session before rendering.
+          const authPromise = supabase.auth.signInWithIdToken({
             provider: "google",
             token: response.credential,
             ...(nonce ? { nonce } : {})
           });
 
+          router.replace("/");
+
+          const { error: googleError } = await authPromise;
           if (googleError) {
-            setGoogleLoading(false);
-            return setError("No pudimos iniciar sesión con Google. Inténtalo de nuevo.");
+            sessionStorage.setItem("playni_google_auth_error", "1");
           }
-
-          if (data.session) {
-            // signInWithIdToken already establishes and persists the Supabase session.
-            // Do not wait for a second getSession() round-trip and do not force a
-            // full document reload; navigate directly inside the Next.js app.
-            router.replace("/");
-            return;
-          }
-
-          setGoogleLoading(false);
-          setError("Google inició sesión, pero no pudimos confirmar la sesión local. Inténtalo de nuevo.");
         }
       });
 
@@ -222,12 +226,6 @@ export default function LoginPage() {
 
   return (
     <main className="auth-page">
-      <Script
-        src="https://accounts.google.com/gsi/client?hl=es-419"
-        strategy="afterInteractive"
-        onLoad={() => setGoogleScriptReady(true)}
-        onError={() => setError("No pudimos cargar el acceso de Google. Inténtalo de nuevo.")}
-      />
       <section className="auth-card">
         <div className="auth-logo-wrap"><img className="auth-logo" src={logoUrl} alt="PLAYNI" /></div>
         <div className="auth-heading">
