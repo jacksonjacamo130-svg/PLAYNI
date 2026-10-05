@@ -208,7 +208,9 @@ export default function LoginPage() {
         width: 240,
         locale: "es_419"
       });
-      requestAnimationFrame(() => setGoogleButtonReady(true));
+      // Wait until the Google iframe has had time to finish painting before
+      // revealing it. This prevents the one-frame blink seen during GIS mount.
+      setTimeout(() => setGoogleButtonReady(true), 250);
     } catch {
       setError("No pudimos preparar el acceso con Google. Inténtalo de nuevo.");
     }
