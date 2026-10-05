@@ -195,6 +195,8 @@ export default function LoginPage() {
       window.google.accounts.id.renderButton(googleButtonRef.current, {
         type: "standard",
         theme: "outline",
+        size: "medium",
+        width: 240,
         // Mantiene el botón oficial de Google y evita mostrar una cuenta fija.
         text: "continue_with",
         shape: "rectangular",
