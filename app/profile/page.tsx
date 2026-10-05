@@ -18,7 +18,6 @@ export default function ProfilePage(){
   const [country,setCountry]=useState("No especificado");
   const [birthDate,setBirthDate]=useState("No especificada");
   const [gender,setGender]=useState("No especificado");
-  const [userId,setUserId]=useState("");
   const [publicId,setPublicId]=useState("");
   const [isAdmin,setIsAdmin]=useState(false);
 
@@ -26,7 +25,6 @@ export default function ProfilePage(){
     const {data:{user}}=await supabase.auth.getUser();
     if(!user){window.location.href="/login";return;}
     setEmail(user.email??"");
-    setUserId(user.id);
     const {data:adminRow}=await supabase.from("admin_users").select("user_id").eq("user_id",user.id).maybeSingle();
     setIsAdmin(!!adminRow);
     const {data}=await supabase.from("profiles").select("public_id,full_name,display_name,country_code,birth_date,gender").eq("id",user.id).maybeSingle();
