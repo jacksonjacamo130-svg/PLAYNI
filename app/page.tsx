@@ -19,26 +19,64 @@ export default function HomePage(){
     [loading,setLoading]=useState(true), [query,setQuery]=useState("");
 
   useEffect(()=>{
-    (async()=>{
-    const {data:{session}}=await supabase.auth.getSession();
-    if(!session){window.location.replace("/login");return;}
-    const [{data:p},{data:w},{count}]=await Promise.all([
-      supabase.from("profiles").select("full_name,display_name").eq("id",session.user.id).maybeSingle(),
-      supabase.from("wallets").select("coins").eq("user_id",session.user.id).maybeSingle(),
-      supabase.from("user_offers").select("id",{count:"exact",head:true}).eq("user_id",session.user.id).eq("status","active")
-    ]);
-    setName(p?.full_name?.trim().split(" ")[0]||p?.display_name||"Jugador");
-    setBalance(((w?.coins??0)/1000).toFixed(2));
-    setStartedCount(count??0);
-    try{
-      const res=await fetch("/api/offers",{headers:{Authorization:"Bearer "+session.access_token}});
-      const data=await res.json();
-      setOffers(data.offers??[]);
-    }catch{}
-    setLoading(false);
-  })()},[]);
+    let cancelled=false;
+
+    const loadHome=async()=>{
+      let session=null;
+
+      // Give Supabase a few short chances to restore the persisted session
+      // before redirecting. This prevents a visible bounce back to /login
+      // immediately after Google GIS finishes.
+      for(let attempt=0; attempt<5; attempt++){
+        const {data:{session:currentSession}}=await supabase.auth.getSession();
+        if(currentSession){
+          session=currentSession;
+          break;
+        }
+        await new Promise(resolve=>setTimeout(resolve, attempt===0 ? 50 : 150));
+      }
+
+      if(cancelled)return;
+      if(!session){window.location.replace("/login");return;}
+
+      const [{data:p},{data:w},{count}]=await Promise.all([
+        supabase.from("profiles").select("full_name,display_name").eq("id",session.user.id).maybeSingle(),
+        supabase.from("wallets").select("coins").eq("user_id",session.user.id).maybeSingle(),
+        supabase.from("user_offers").select("id",{count:"exact",head:true}).eq("user_id",session.user.id).eq("status","active")
+      ]);
+
+      if(cancelled)return;
+      setName(p?.full_name?.trim().split(" ")[0]||p?.display_name||"Jugador");
+      setBalance(((w?.coins??0)/1000).toFixed(2));
+      setStartedCount(count??0);
+
+      try{
+        const res=await fetch("/api/offers",{headers:{Authorization:"Bearer "+session.access_token}});
+        const data=await res.json();
+        if(!cancelled)setOffers(data.offers??[]);
+      }catch{}
+
+      if(!cancelled)setLoading(false);
+    };
+
+    void loadHome();
+    return()=>{cancelled=true;};
+  },[]);
 
   const filtered=offers.filter(o=>(o.title+" "+o.category+" "+o.description).toLowerCase().includes(query.toLowerCase()));
+
+  if(loading) return (
+    <main className="auth-page">
+      <section className="auth-card">
+        <div className="auth-logo-wrap"><img className="auth-logo" src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI" /></div>
+        <div className="auth-heading">
+          <h1>Entrando a PLAYNI</h1>
+          <p>Estamos preparando tu cuenta...</p>
+        </div>
+        <div style={{display:"flex",justifyContent:"center",paddingTop:12}}><LoaderCircle className="spin" size={28} /></div>
+      </section>
+    </main>
+  );
 
   return <main className="app-shell discover-page">
     <header className="topbar discover-topbar">
