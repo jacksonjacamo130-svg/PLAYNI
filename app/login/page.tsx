@@ -36,7 +36,7 @@ export default function LoginPage() {
   const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedLegal, setAcceptedLegal] = useState(false);
-  const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [googleButtonReady, setGoogleButtonReady] = useState(false), [googleTransitioning, setGoogleTransitioning] = useState(() => typeof window !== "undefined" && sessionStorage.getItem("playni_google_handoff") === "1"), [confirmingEmail, setConfirmingEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("confirmed") === "1"), [googleScriptReady, setGoogleScriptReady] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
+  const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [googleButtonReady, setGoogleButtonReady] = useState(false), [confirmingEmail, setConfirmingEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("confirmed") === "1"), [googleScriptReady, setGoogleScriptReady] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
   const googleButtonRef = useRef<HTMLDivElement>(null);
   const googleNonceRef = useRef<string | null>(null);
   const googleIdentityInitializedRef = useRef(false);
@@ -193,10 +193,6 @@ export default function LoginPage() {
 
             if (confirmedSession) {
               sessionStorage.setItem("playni_google_handoff", "1");
-              setGoogleTransitioning(true);
-              // Use a full navigation after Google has authenticated. The
-              // session is already persisted by signInWithIdToken, and the
-              // dark app shell prevents any white reload flash.
               window.location.replace("/");
               return;
             }
@@ -255,15 +251,6 @@ export default function LoginPage() {
     } catch {
       setError("No pudimos preparar el acceso con Google. Inténtalo de nuevo.");
     }
-  }
-
-  if (googleTransitioning) {
-    return <main className="auth-page auth-transition" aria-label="Entrando a PLAYNI">
-      <section className="auth-card auth-transition-card">
-        <div className="auth-logo-wrap"><img className="auth-logo" src={logoUrl} alt="PLAYNI" /></div>
-        <Loader2 className="spin" size={26} />
-      </section>
-    </main>;
   }
 
   if (confirmingEmail) {
