@@ -53,13 +53,31 @@ export default function HomePage(){
     });
 
     const authHandoff = typeof window !== "undefined" && sessionStorage.getItem("playni_google_handoff") === "1";
+    const handoffAccessToken = typeof window !== "undefined" ? sessionStorage.getItem("playni_google_access_token") : null;
+    const handoffRefreshToken = typeof window !== "undefined" ? sessionStorage.getItem("playni_google_refresh_token") : null;
 
     const resolveSession = async()=>{
+      if(handoffAccessToken && handoffRefreshToken){
+        const {data:{session:restoredSession}}=await supabase.auth.setSession({
+          access_token: handoffAccessToken,
+          refresh_token: handoffRefreshToken
+        });
+        if(restoredSession && !cancelled){
+          sessionStorage.removeItem("playni_google_handoff");
+          sessionStorage.removeItem("playni_google_access_token");
+          sessionStorage.removeItem("playni_google_refresh_token");
+          void loadHome(restoredSession as NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>);
+          return;
+        }
+      }
+
       for(let attempt=0; attempt<(authHandoff ? 40 : 1); attempt++){
         const {data:{session}}=await supabase.auth.getSession();
         if(cancelled)return;
         if(session){
           sessionStorage.removeItem("playni_google_handoff");
+          sessionStorage.removeItem("playni_google_access_token");
+          sessionStorage.removeItem("playni_google_refresh_token");
           void loadHome(session as NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>);
           return;
         }
@@ -69,12 +87,12 @@ export default function HomePage(){
 
       if(cancelled)return;
       sessionStorage.removeItem("playni_google_handoff");
+      sessionStorage.removeItem("playni_google_access_token");
+      sessionStorage.removeItem("playni_google_refresh_token");
       redirectTimer=setTimeout(()=>{
         if(!cancelled) window.location.replace("/login");
       },500);
     };
-
-    void resolveSession();
 
     return()=>{
       cancelled=true;
