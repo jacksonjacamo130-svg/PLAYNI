@@ -482,3 +482,25 @@ button,a{font:inherit}
 .legal-consent input{width:16px!important;height:16px!important;flex:0 0 16px!important;margin:1px 0 0!important;accent-color:#ffc83d}
 .legal-consent span{display:block}.legal-consent a{color:#ffc83d;text-decoration:none;font-weight:800}.legal-consent a:hover{text-decoration:underline}
 @media(max-width:700px){.legal-card{width:calc(100% - 20px);padding:24px 18px 28px;border-radius:17px}.legal-card h2{font-size:16px}.legal-card p,.legal-card li{font-size:11px;line-height:1.68}.legal-brand img{width:50px;height:50px}.legal-topbar{padding:0 12px}}
+
+
+/* PLAYNI — phone layout fallback
+   Covers Android browsers that report a wide CSS viewport after OAuth. */
+html.mobile-device .app-shell{padding-bottom:92px}
+html.mobile-device .topbar{height:64px;padding:0 14px}
+html.mobile-device .discover-topbar{height:88px;padding:0 14px}
+html.mobile-device .discover-welcome{padding:17px 16px 16px}
+html.mobile-device .discover-welcome h1{font-size:29px}
+html.mobile-device .discover-welcome p{font-size:12px}
+html.mobile-device .discover-search-section{padding:0 16px}
+html.mobile-device .discover-search{height:52px;margin-bottom:16px}
+html.mobile-device .discover-offers{padding-left:16px;padding-right:16px}
+html.mobile-device .discover-heading h2{font-size:25px}
+html.mobile-device .discover-grid{grid-template-columns:1fr!important;gap:14px}
+html.mobile-device .discover-cover{height:190px}
+html.mobile-device .discover-card-body{padding:16px}
+html.mobile-device .discover-trust{padding-left:16px;padding-right:16px}
+html.mobile-device .bottom-nav{display:flex!important;position:fixed;bottom:0;left:0;right:0;height:70px;padding-bottom:env(safe-area-inset-bottom);box-sizing:content-box;background:#0f1521;border-top:1px solid #252e40;z-index:30;justify-content:space-around}
+html.mobile-device .bottom-nav a{color:#788196;text-decoration:none;font-size:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;flex:1;padding:8px 2px}
+html.mobile-device .bottom-nav a.active{color:#ffc83d}
+html.mobile-device .brand-logo-hero{width:76px;height:76px;transform:scale(1.03)}
