@@ -184,6 +184,7 @@ export default function LoginPage() {
             });
 
             if (persisted.session) {
+              sessionStorage.setItem("playni_google_handoff", "1");
               router.replace("/");
               return;
             }
