@@ -504,3 +504,17 @@ html.mobile-device .bottom-nav{display:flex!important;position:fixed;bottom:0;le
 html.mobile-device .bottom-nav a{color:#788196;text-decoration:none;font-size:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;flex:1;padding:8px 2px}
 html.mobile-device .bottom-nav a.active{color:#ffc83d}
 html.mobile-device .brand-logo-hero{width:76px;height:76px;transform:scale(1.03)}
+
+/* PLAYNI — ADMIN USER DELETE */
+.admin-delete-user{
+  border:1px solid #63323a;
+  background:#2b171b;
+  color:#ffb8c0;
+  border-radius:8px;
+  padding:7px 9px;
+  font-size:8px;
+  font-weight:900;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.admin-delete-user:disabled{opacity:.55;cursor:wait}
