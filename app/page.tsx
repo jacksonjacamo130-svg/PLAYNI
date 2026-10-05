@@ -52,16 +52,29 @@ export default function HomePage(){
       if(session) void loadHome(session as NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>);
     });
 
-    supabase.auth.getSession().then(({data:{session}})=>{
-      if(cancelled)return;
-      if(session){
-        void loadHome(session as NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>);
-        return;
+    const authHandoff = typeof window !== "undefined" && sessionStorage.getItem("playni_google_handoff") === "1";
+
+    const resolveSession = async()=>{
+      for(let attempt=0; attempt<(authHandoff ? 40 : 1); attempt++){
+        const {data:{session}}=await supabase.auth.getSession();
+        if(cancelled)return;
+        if(session){
+          sessionStorage.removeItem("playni_google_handoff");
+          void loadHome(session as NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>);
+          return;
+        }
+        if(!authHandoff)break;
+        await new Promise(resolve=>setTimeout(resolve,150));
       }
+
+      if(cancelled)return;
+      sessionStorage.removeItem("playni_google_handoff");
       redirectTimer=setTimeout(()=>{
         if(!cancelled) window.location.replace("/login");
-      },2500);
-    });
+      },500);
+    };
+
+    void resolveSession();
 
     return()=>{
       cancelled=true;
