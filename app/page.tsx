@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Coins, ChevronRight, Clock3, LoaderCircle, Search, ShieldCheck, Sparkles, Gamepad2, ListChecks } from "lucide-react";
 import { supabase } from "../lib/supabase";
@@ -20,20 +20,13 @@ export default function HomePage(){
 
   useEffect(()=>{
     let cancelled=false;
+    let loadedUserId:string|null=null;
+    let redirectTimer:ReturnType<typeof setTimeout>|null=null;
 
-    const loadHome=async()=>{
-      let session=null;
-
-      // Restore the persisted Supabase session directly from local storage.
-      // Avoid an artificial polling screen after login.
-      const {data:{session:currentSession}}=await supabase.auth.getSession();
-
-      if(cancelled)return;
-      session=currentSession;
-      if(!session){window.location.replace("/login");return;}
-
-      // Authentication is ready; render the app immediately.
-      // Profile, balance, active games and offers continue loading in the background.
+    const loadHome=async(session:NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>)=>{
+      if(cancelled || loadedUserId===session.user.id)return;
+      loadedUserId=session.user.id;
+      if(redirectTimer){clearTimeout(redirectTimer);redirectTimer=null;}
       setLoading(false);
 
       const offersPromise = fetch("/api/offers",{headers:{Authorization:"Bearer "+session.access_token}})
@@ -55,13 +48,31 @@ export default function HomePage(){
       setDataLoading(false);
     };
 
-    void loadHome();
-    return()=>{cancelled=true;};
+    const {data:{subscription}}=supabase.auth.onAuthStateChange((_event,session)=>{
+      if(session) void loadHome(session as NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>);
+    });
+
+    supabase.auth.getSession().then(({data:{session}})=>{
+      if(cancelled)return;
+      if(session){
+        void loadHome(session as NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>);
+        return;
+      }
+      redirectTimer=setTimeout(()=>{
+        if(!cancelled) window.location.replace("/login");
+      },2500);
+    });
+
+    return()=>{
+      cancelled=true;
+      subscription.unsubscribe();
+      if(redirectTimer)clearTimeout(redirectTimer);
+    };
   },[]);
 
   const filtered=offers.filter(o=>(o.title+" "+o.category+" "+o.description).toLowerCase().includes(query.toLowerCase()));
 
-  if(loading) return <main className="app-shell discover-page" aria-hidden="true" />;
+  if(loading) return <main className="app-shell discover-page auth-boot" aria-label="Cargando PLAYNI"><LoaderCircle size={27}/></main>;
 
   return <main className="app-shell discover-page">
     <header className="topbar discover-topbar">
