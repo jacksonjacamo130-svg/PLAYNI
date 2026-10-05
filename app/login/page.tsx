@@ -45,6 +45,10 @@ export default function LoginPage() {
 
   function switchMode(next: "login" | "register" | "reset") { setMode(next); setError(""); setMessage(""); }
   useEffect(() => {
+    router.prefetch("/");
+  }, [router]);
+
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("reset") === "1") setMode("reset");
 
@@ -172,20 +176,6 @@ export default function LoginPage() {
           }
 
           if (data.session) {
-            // Full page navigation keeps the freshly persisted Supabase session
-            // intact without the router transition flashing the login screen.
-            for (let attempt = 0; attempt < 5; attempt++) {
-              const { data: sessionData } = await supabase.auth.getSession();
-              if (sessionData.session) {
-                router.replace("/");
-                return;
-              }
-              await new Promise((resolve) => setTimeout(resolve, 100));
-            }
-          }
-
-          const { data: sessionData } = await supabase.auth.getSession();
-          if (sessionData.session) {
             router.replace("/");
             return;
           }
