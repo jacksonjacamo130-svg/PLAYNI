@@ -182,7 +182,9 @@ export default function LoginPage() {
       window.google.accounts.id.renderButton(googleButtonRef.current, {
         type: "standard",
         theme: "outline",
-        size: "large",
+        // Medium evita el botón personalizado de Google que muestra la cuenta/email.
+        // Google mantiene el texto oficial "Continuar con Google".
+        size: "medium",
         text: "continue_with",
         shape: "rectangular",
         logo_alignment: "left",
@@ -192,6 +194,21 @@ export default function LoginPage() {
     } catch {
       setError("No pudimos preparar el acceso con Google. Inténtalo de nuevo.");
     }
+  }
+
+  if (googleLoading) {
+    return (
+      <main className="auth-page">
+        <section className="auth-card">
+          <div className="auth-logo-wrap"><img className="auth-logo" src={logoUrl} alt="PLAYNI" /></div>
+          <div className="auth-heading">
+            <h1>Entrando a PLAYNI</h1>
+            <p>Estamos verificando tu cuenta de Google. Un momento...</p>
+          </div>
+          <div style={{display:"flex",justifyContent:"center",paddingTop:12}}><Loader2 className="spin" size={28} /></div>
+        </section>
+      </main>
+    );
   }
 
   if (confirmingEmail) {
