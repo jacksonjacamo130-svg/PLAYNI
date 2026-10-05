@@ -40,7 +40,6 @@ export default function LoginPage() {
   const googleButtonRef = useRef<HTMLDivElement>(null);
   const googleNonceRef = useRef<string | null>(null);
   const googleIdentityInitializedRef = useRef(false);
-  const googleButtonObserverRef = useRef<MutationObserver | null>(null);
   const selectedCountry = useMemo(() => countries.find((item) => item.code === country) ?? countries[0], [country]);
   const fullPhone = () => selectedCountry.dial + phone.replace(/\D/g, "");
 
@@ -136,8 +135,6 @@ export default function LoginPage() {
   useEffect(() => {
     if (mode !== "login") {
       googleIdentityInitializedRef.current = false;
-      googleButtonObserverRef.current?.disconnect();
-      setGoogleButtonReady(false);
       return;
     }
     if (googleScriptReady && !googleIdentityInitializedRef.current) {
@@ -204,30 +201,6 @@ export default function LoginPage() {
       });
 
       googleButtonRef.current.innerHTML = "";
-      setGoogleButtonReady(false);
-      googleButtonObserverRef.current?.disconnect();
-
-      const revealWhenGoogleIsPainted = () => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            setGoogleButtonReady(true);
-          });
-        });
-      };
-
-      const watchGoogleIframe = () => {
-        if (!googleButtonRef.current) return false;
-        const iframe = googleButtonRef.current.querySelector("iframe");
-        if (!iframe) return false;
-        iframe.addEventListener("load", revealWhenGoogleIsPainted, { once: true });
-        return true;
-      };
-
-      googleButtonObserverRef.current = new MutationObserver(() => {
-        if (watchGoogleIframe()) googleButtonObserverRef.current?.disconnect();
-      });
-      googleButtonObserverRef.current.observe(googleButtonRef.current, { childList: true, subtree: true });
-
       window.google.accounts.id.renderButton(googleButtonRef.current, {
         type: "standard",
         theme: "outline",
@@ -240,14 +213,6 @@ export default function LoginPage() {
         locale: "es_419"
       });
 
-      if (watchGoogleIframe()) {
-        googleButtonObserverRef.current?.disconnect();
-      } else {
-        // Safety net only: keep the button hidden while Google finishes mounting.
-        setTimeout(() => {
-          if (!googleButtonReady) revealWhenGoogleIsPainted();
-        }, 1500);
-      }
     } catch {
       setError("No pudimos preparar el acceso con Google. Inténtalo de nuevo.");
     }
@@ -320,7 +285,7 @@ export default function LoginPage() {
           <button className="auth-button" type="submit" disabled={loading || googleLoading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : mode === "reset" ? "CAMBIAR CONTRASEÑA" : "CREAR CUENTA"}</button>
           {mode === "login" && <>
             <div className="auth-divider"><span>o</span></div>
-            <div className={`google-button-wrap${googleButtonReady ? " google-ready" : ""}`} style={{ pointerEvents: googleButtonReady ? "auto" : "none" }} ref={googleButtonRef} aria-label="Continuar con Google" />
+            <div className="google-button-wrap" ref={googleButtonRef} aria-label="Continuar con Google" />
           </>}
         {mode === "login" && <button type="button" className="auth-link-button" onClick={async () => {
           if (!email.trim() || !email.includes("@")) return setError("Escribe primero tu correo electrónico.");
