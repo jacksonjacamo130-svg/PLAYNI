@@ -51,14 +51,21 @@ export default function HomePage(){
     });
 
     const resolveSession = async()=>{
-      const {data:{session}}=await supabase.auth.getSession();
-      if(cancelled)return;
-      if(session){
-        void loadHome(session as NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>);
-        return;
+      for(let attempt=0; attempt<25; attempt++){
+        const {data:{session}}=await supabase.auth.getSession();
+        if(cancelled)return;
+        if(session){
+          void loadHome(session as NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>);
+          return;
+        }
+        await new Promise(resolve=>setTimeout(resolve,100));
       }
+
+      if(cancelled)return;
       window.location.replace("/login");
     };
+
+    void resolveSession();
 
     return()=>{
       cancelled=true;
