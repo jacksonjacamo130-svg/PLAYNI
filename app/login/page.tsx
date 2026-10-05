@@ -143,6 +143,7 @@ export default function LoginPage() {
 
       window.google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
+        auto_select: false,
         nonce: hashedNonce,
         callback: async (response: { credential: string }) => {
           setGoogleLoading(true);
