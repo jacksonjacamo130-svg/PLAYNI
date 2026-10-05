@@ -34,7 +34,7 @@ export default function LoginPage() {
   const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedLegal, setAcceptedLegal] = useState(false);
-  const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [confirmingEmail, setConfirmingEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("confirmed") === "1"), [message, setMessage] = useState(""), [error, setError] = useState("");
+  const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [confirmingEmail, setConfirmingEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("confirmed") === "1"), [googleScriptReady, setGoogleScriptReady] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
   const googleButtonRef = useRef<HTMLDivElement>(null);
   const googleNonceRef = useRef<string | null>(null);
   const selectedCountry = useMemo(() => countries.find((item) => item.code === country) ?? countries[0], [country]);
@@ -125,6 +125,12 @@ export default function LoginPage() {
     setMode("login");
   }
 
+  useEffect(() => {
+    if (mode === "login" && googleScriptReady) {
+      void prepareGoogleIdentity();
+    }
+  }, [mode, googleScriptReady]);
+
   async function prepareGoogleIdentity() {
     if (!window.google || !googleButtonRef.current) return;
 
@@ -208,7 +214,7 @@ export default function LoginPage() {
       <Script
         src="https://accounts.google.com/gsi/client?hl=es-419"
         strategy="afterInteractive"
-        onLoad={prepareGoogleIdentity}
+        onLoad={() => setGoogleScriptReady(true)}
         onError={() => setError("No pudimos cargar el acceso de Google. Inténtalo de nuevo.")}
       />
       <section className="auth-card">
