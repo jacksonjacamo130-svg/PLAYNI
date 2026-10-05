@@ -37,6 +37,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [confirmingEmail, setConfirmingEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("confirmed") === "1"), [googleScriptReady, setGoogleScriptReady] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
   const googleButtonRef = useRef<HTMLDivElement>(null);
   const googleNonceRef = useRef<string | null>(null);
+  const googleIdentityInitializedRef = useRef(false);
   const selectedCountry = useMemo(() => countries.find((item) => item.code === country) ?? countries[0], [country]);
   const fullPhone = () => selectedCountry.dial + phone.replace(/\D/g, "");
 
@@ -126,13 +127,18 @@ export default function LoginPage() {
   }
 
   useEffect(() => {
-    if (mode === "login" && googleScriptReady) {
+    if (mode !== "login") {
+      googleIdentityInitializedRef.current = false;
+      return;
+    }
+    if (googleScriptReady && !googleIdentityInitializedRef.current) {
       void prepareGoogleIdentity();
     }
   }, [mode, googleScriptReady]);
 
   async function prepareGoogleIdentity() {
-    if (!window.google || !googleButtonRef.current) return;
+    if (!window.google || !googleButtonRef.current || googleIdentityInitializedRef.current) return;
+    googleIdentityInitializedRef.current = true;
 
     try {
       const rawNonceBytes = crypto.getRandomValues(new Uint8Array(32));
@@ -163,23 +169,20 @@ export default function LoginPage() {
           }
 
           if (data.session) {
-            // Give Supabase a moment to finish persisting the session before
-            // leaving the login page. This prevents / from briefly seeing no
-            // session and bouncing the user back to /login.
-            for (let attempt = 0; attempt < 10; attempt++) {
+            // Full page navigation keeps the freshly persisted Supabase session
+            // intact without the router transition flashing the login screen.
+            for (let attempt = 0; attempt < 5; attempt++) {
               const { data: sessionData } = await supabase.auth.getSession();
               if (sessionData.session) {
-                await new Promise((resolve) => setTimeout(resolve, 250));
                 window.location.replace("/");
                 return;
               }
-              await new Promise((resolve) => setTimeout(resolve, 150));
+              await new Promise((resolve) => setTimeout(resolve, 100));
             }
           }
 
           const { data: sessionData } = await supabase.auth.getSession();
           if (sessionData.session) {
-            await new Promise((resolve) => setTimeout(resolve, 250));
             window.location.replace("/");
             return;
           }
@@ -204,21 +207,6 @@ export default function LoginPage() {
     } catch {
       setError("No pudimos preparar el acceso con Google. Inténtalo de nuevo.");
     }
-  }
-
-  if (googleLoading) {
-    return (
-      <main className="auth-page">
-        <section className="auth-card">
-          <div className="auth-logo-wrap"><img className="auth-logo" src={logoUrl} alt="PLAYNI" /></div>
-          <div className="auth-heading">
-            <h1>Entrando a PLAYNI</h1>
-            <p>Estamos verificando tu cuenta de Google. Un momento...</p>
-          </div>
-          <div style={{display:"flex",justifyContent:"center",paddingTop:12}}><Loader2 className="spin" size={28} /></div>
-        </section>
-      </main>
-    );
   }
 
   if (confirmingEmail) {
@@ -289,7 +277,6 @@ export default function LoginPage() {
           {mode === "login" && <>
             <div className="auth-divider"><span>o</span></div>
             <div className={googleLoading ? "google-button-wrap is-loading" : "google-button-wrap"} ref={googleButtonRef} aria-label="Continuar con Google" />
-            {googleLoading && <div className="google-status"><Loader2 className="spin" size={16} /> Conectando con Google...</div>}
           </>}
         {mode === "login" && <button type="button" className="auth-link-button" onClick={async () => {
           if (!email.trim() || !email.includes("@")) return setError("Escribe primero tu correo electrónico.");
