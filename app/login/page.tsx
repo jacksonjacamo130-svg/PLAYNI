@@ -39,6 +39,7 @@ export default function LoginPage() {
   const googleButtonRef = useRef<HTMLDivElement>(null);
   const googleNonceRef = useRef<string | null>(null);
   const googleIdentityInitializedRef = useRef(false);
+  const googleLoadHandlerRef = useRef<((event: Event) => void) | null>(null);
   const selectedCountry = useMemo(() => countries.find((item) => item.code === country) ?? countries[0], [country]);
   const fullPhone = () => selectedCountry.dial + phone.replace(/\D/g, "");
 
@@ -132,13 +133,26 @@ export default function LoginPage() {
   }
 
   useLayoutEffect(() => {
+    const cleanupGoogleButton = () => {
+      const container = googleButtonRef.current;
+      const handler = googleLoadHandlerRef.current;
+      if (container && handler) container.removeEventListener("load", handler, true);
+      googleLoadHandlerRef.current = null;
+      if (container) {
+        container.classList.remove("google-ready");
+        container.innerHTML = "";
+      }
+    };
+
     if (mode !== "login") {
+      cleanupGoogleButton();
       googleIdentityInitializedRef.current = false;
       return;
     }
+
     if (window.google && !googleIdentityInitializedRef.current) {
       void prepareGoogleIdentity();
-      return;
+      return cleanupGoogleButton;
     }
 
     let attempts = 0;
@@ -151,6 +165,8 @@ export default function LoginPage() {
       if (attempts++ < 20) window.setTimeout(retry, 50);
     };
     retry();
+
+    return cleanupGoogleButton;
   }, [mode]);
 
   async function prepareGoogleIdentity() {
@@ -191,9 +207,23 @@ export default function LoginPage() {
         }
       });
 
-      googleButtonRef.current.innerHTML = "";
+      const container = googleButtonRef.current;
+      if (!container) return;
 
-      window.google.accounts.id.renderButton(googleButtonRef.current, {
+      container.classList.remove("google-ready");
+      container.innerHTML = "";
+
+      const revealWhenGoogleIframeLoads = (event: Event) => {
+        if (!(event.target instanceof HTMLIFrameElement)) return;
+        window.requestAnimationFrame(() => {
+          if (googleButtonRef.current === container) container.classList.add("google-ready");
+        });
+      };
+
+      googleLoadHandlerRef.current = revealWhenGoogleIframeLoads;
+      container.addEventListener("load", revealWhenGoogleIframeLoads, true);
+
+      window.google.accounts.id.renderButton(container, {
         type: "standard",
         theme: "outline",
         size: "medium",
@@ -271,7 +301,7 @@ export default function LoginPage() {
           <button className="auth-button" type="submit" disabled={loading || googleLoading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : mode === "reset" ? "CAMBIAR CONTRASEÑA" : "CREAR CUENTA"}</button>
           {mode === "login" && <>
             <div className="auth-divider"><span>o</span></div>
-            <div className="google-button-wrap google-ready" ref={googleButtonRef} aria-label="Continuar con Google" />
+            <div className="google-button-wrap" ref={googleButtonRef} aria-label="Continuar con Google" />
           </>}
         {mode === "login" && <button type="button" className="auth-link-button" onClick={async () => {
           if (!email.trim() || !email.includes("@")) return setError("Escribe primero tu correo electrónico.");
