@@ -196,11 +196,9 @@ export default function LoginPage() {
         type: "standard",
         theme: "outline",
         // Mantiene el botón oficial de Google y evita mostrar una cuenta fija.
-        size: "medium",
         text: "continue_with",
         shape: "rectangular",
         logo_alignment: "left",
-        width: 240,
         locale: "es_419"
       });
 
