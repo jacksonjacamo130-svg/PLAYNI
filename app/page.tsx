@@ -20,13 +20,6 @@ export default function HomePage(){
 
   useEffect(()=>{
     (async()=>{
-    let googlePending = false;
-    try { googlePending = window.sessionStorage.getItem("playni_google_pending") === "1"; } catch {}
-    if (googlePending) {
-      try { window.sessionStorage.removeItem("playni_google_pending"); } catch {}
-      const { data: { session: returnedSession } } = await supabase.auth.getSession();
-      if (returnedSession) { window.location.reload(); return; }
-    }
     const {data:{session}}=await supabase.auth.getSession();
     if(!session){window.location.replace("/login");return;}
     const [{data:p},{data:w},{count}]=await Promise.all([
