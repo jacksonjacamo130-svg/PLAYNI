@@ -39,7 +39,6 @@ export default function LoginPage() {
   const googleButtonRef = useRef<HTMLDivElement>(null);
   const googleNonceRef = useRef<string | null>(null);
   const googleIdentityInitializedRef = useRef(false);
-  const googleLoadHandlerRef = useRef<((event: Event) => void) | null>(null);
   const selectedCountry = useMemo(() => countries.find((item) => item.code === country) ?? countries[0], [country]);
   const fullPhone = () => selectedCountry.dial + phone.replace(/\D/g, "");
 
@@ -135,13 +134,7 @@ export default function LoginPage() {
   useLayoutEffect(() => {
     const cleanupGoogleButton = () => {
       const container = googleButtonRef.current;
-      const handler = googleLoadHandlerRef.current;
-      if (container && handler) container.removeEventListener("load", handler, true);
-      googleLoadHandlerRef.current = null;
-      if (container) {
-        container.classList.remove("google-ready");
-        container.innerHTML = "";
-      }
+      if (container) container.innerHTML = "";
     };
 
     if (mode !== "login") {
@@ -210,18 +203,7 @@ export default function LoginPage() {
       const container = googleButtonRef.current;
       if (!container) return;
 
-      container.classList.remove("google-ready");
       container.innerHTML = "";
-
-      const revealWhenGoogleIframeLoads = (event: Event) => {
-        if (!(event.target instanceof HTMLIFrameElement)) return;
-        window.requestAnimationFrame(() => {
-          if (googleButtonRef.current === container) container.classList.add("google-ready");
-        });
-      };
-
-      googleLoadHandlerRef.current = revealWhenGoogleIframeLoads;
-      container.addEventListener("load", revealWhenGoogleIframeLoads, true);
 
       window.google.accounts.id.renderButton(container, {
         type: "standard",
@@ -301,7 +283,17 @@ export default function LoginPage() {
           <button className="auth-button" type="submit" disabled={loading || googleLoading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : mode === "reset" ? "CAMBIAR CONTRASEÑA" : "CREAR CUENTA"}</button>
           {mode === "login" && <>
             <div className="auth-divider"><span>o</span></div>
-            <div className="google-button-wrap" ref={googleButtonRef} aria-label="Continuar con Google" />
+            <div className="google-button-wrap" ref={googleButtonRef} aria-label="Continuar con Google">
+              <div className="google-button-visual" aria-hidden="true">
+                <svg className="google-g-mark" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M21.35 12.27c0-.79-.07-1.55-.21-2.27H12v4.3h5.21c-.22 1.17-.9 2.17-1.91 2.84v2.36h3.1c1.81-1.67 2.85-4.13 2.85-7.23Z" fill="#4285F4"/>
+                  <path d="M12 21.5c2.59 0 4.76-.86 6.34-2.33l-3.1-2.36c-.86.58-1.96.92-3.24.92-2.49 0-4.6-1.68-5.35-3.94H3.44v2.44C5.01 19.42 8.28 21.5 12 21.5Z" fill="#34A853"/>
+                  <path d="M6.65 13.79c-.19-.58-.3-1.2-.3-1.79s.11-1.21.3-1.79V7.77H3.44C2.81 9.02 2.45 10.43 2.45 12s.36 2.98.99 4.23l3.21-2.44Z" fill="#FBBC05"/>
+                  <path d="M12 6.27c1.41 0 2.68.49 3.68 1.45l2.76-2.76C16.76 3.4 14.59 2.5 12 2.5c-3.72 0-6.99 2.08-8.56 5.23l3.21 2.44C7.4 7.95 9.51 6.27 12 6.27Z" fill="#EA4335"/>
+                </svg>
+                <span>Continuar con Google</span>
+              </div>
+            </div>
           </>}
         {mode === "login" && <button type="button" className="auth-link-button" onClick={async () => {
           if (!email.trim() || !email.includes("@")) return setError("Escribe primero tu correo electrónico.");
