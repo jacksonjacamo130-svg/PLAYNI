@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { CheckCircle2, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { supabase } from "../../lib/supabase";
@@ -29,6 +30,7 @@ declare global {
 }
 
 export default function LoginPage() {
+  const router = useRouter();
   const [mode, setMode] = useState<"login" | "register" | "reset">("login");
   const [fullName, setFullName] = useState(""), [birthDate, setBirthDate] = useState(""), [gender, setGender] = useState(""), [country, setCountry] = useState("NI");
   const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
@@ -163,24 +165,15 @@ export default function LoginPage() {
           }
 
           if (data.session) {
-            // Give Supabase a moment to finish persisting the session before
-            // leaving the login page. This prevents / from briefly seeing no
-            // session and bouncing the user back to /login.
-            for (let attempt = 0; attempt < 10; attempt++) {
-              const { data: sessionData } = await supabase.auth.getSession();
-              if (sessionData.session) {
-                await new Promise((resolve) => setTimeout(resolve, 250));
-                window.location.replace("/");
-                return;
-              }
-              await new Promise((resolve) => setTimeout(resolve, 150));
-            }
+            // The home page now tolerates a brief session-restore delay,
+            // so do not keep the login screen visible while polling.
+            router.replace("/");
+            return;
           }
 
           const { data: sessionData } = await supabase.auth.getSession();
           if (sessionData.session) {
-            await new Promise((resolve) => setTimeout(resolve, 250));
-            window.location.replace("/");
+            router.replace("/");
             return;
           }
 
