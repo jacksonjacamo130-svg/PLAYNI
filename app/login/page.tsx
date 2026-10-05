@@ -124,10 +124,8 @@ export default function LoginPage() {
 
   async function signInWithGoogle() {
     setGoogleLoading(true); setError(""); setMessage("");
-    try { window.sessionStorage.setItem("playni_google_pending", "1"); } catch {}
     const { error: googleError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin + "/login" }
+      provider: "google"
     });
     if (googleError) {
       setGoogleLoading(false);
