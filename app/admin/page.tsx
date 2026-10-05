@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Activity, ArrowLeft, CheckCircle2, ChevronDown, CircleDollarSign, Gamepad2, LoaderCircle, ShieldCheck, Users, WalletCards, XCircle } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
-type Profile = { id:string; full_name:string|null; display_name:string|null; country_code:string|null; gender:string|null; birth_date:string|null; created_at:string; };
+type Profile = { id:string; public_id:string; full_name:string|null; display_name:string|null; country_code:string|null; gender:string|null; birth_date:string|null; created_at:string; };
 type Wallet = { user_id:string; coins:number; lifetime_earned:number; };
 type Offer = { id:string; provider:string; title:string; category:string|null; platform:string|null; user_reward_coins:number|null; active:boolean; country_code:string|null; synced_at:string; };
 type Withdrawal = { id:string; user_id:string; paypal_email:string; amount_coins:number; status:string; requested_at:string; processed_at:string|null; rejection_reason:string|null; };
@@ -16,7 +16,7 @@ const money=(coins:number|null|undefined)=>"$"+(Number(coins??0)/1000).toFixed(2
 export default function AdminPage(){
   const [loading,setLoading]=useState(true),[allowed,setAllowed]=useState(false),[tab,setTab]=useState<Tab>("overview");
   const [profiles,setProfiles]=useState<Profile[]>([]),[wallets,setWallets]=useState<Wallet[]>([]),[offers,setOffers]=useState<Offer[]>([]),[withdrawals,setWithdrawals]=useState<Withdrawal[]>([]),[conversions,setConversions]=useState<Conversion[]>([]);
-  const [updatingId,setUpdatingId]=useState(""),[error,setError]=useState("");
+  const [updatingId,setUpdatingId]=useState(""),[deletingUserId,setDeletingUserId]=useState(""),[error,setError]=useState("");
 
   async function loadAdmin(){
     setLoading(true);setError("");
@@ -26,7 +26,7 @@ export default function AdminPage(){
     if(adminError||!adminRow){setAllowed(false);setLoading(false);return;}
     setAllowed(true);
     const [a,b,c,d,e]=await Promise.all([
-      supabase.from("profiles").select("id,full_name,display_name,country_code,gender,birth_date,created_at").order("created_at",{ascending:false}),
+      supabase.from("profiles").select("id,public_id,full_name,display_name,country_code,gender,birth_date,created_at").order("created_at",{ascending:false}),
       supabase.from("wallets").select("user_id,coins,lifetime_earned").order("updated_at",{ascending:false}),
       supabase.from("offer_catalog").select("id,provider,title,category,platform,user_reward_coins,active,country_code,synced_at").order("synced_at",{ascending:false}).limit(100),
       supabase.from("withdrawals").select("id,user_id,paypal_email,amount_coins,status,requested_at,processed_at,rejection_reason").order("requested_at",{ascending:false}).limit(100),
@@ -52,6 +52,24 @@ export default function AdminPage(){
     const {error:e}=await supabase.from("offer_catalog").update({active:!offer.active}).eq("id",offer.id);
     if(e)setError(e.message);else setOffers(cur=>cur.map(x=>x.id===offer.id?{...x,active:!x.active}:x));
     setUpdatingId("");
+  }
+
+  async function deleteUser(profile:Profile){
+    if(profile.id===undefined)return;
+    const label=profile.full_name||profile.display_name||profile.public_id||"este usuario";
+    if(!window.confirm("¿Eliminar definitivamente la cuenta de "+label+"? Esta acción no se puede deshacer."))return;
+    setDeletingUserId(profile.id);setError("");
+    const {data,error:e}=await supabase.functions.invoke("admin-delete-user",{body:{user_id:profile.id}});
+    if(e){
+      setError(e.message||"No se pudo eliminar el usuario.");
+    }else if(data?.error){
+      setError(String(data.error));
+    }else{
+      setProfiles(cur=>cur.filter(x=>x.id!==profile.id));
+      setWallets(cur=>cur.filter(x=>x.user_id!==profile.id));
+      setWithdrawals(cur=>cur.filter(x=>x.user_id!==profile.id));
+    }
+    setDeletingUserId("");
   }
 
   async function updateWithdrawal(withdrawal:Withdrawal,status:string){
@@ -94,8 +112,8 @@ export default function AdminPage(){
       </section>}
 
       {tab==="users"&&<section className="admin-panel-card"><div className="admin-card-head"><div><span className="eyebrow">CUENTAS</span><h2>Usuarios registrados</h2></div><span className="admin-count">{profiles.length}</span></div>
-        <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Usuario</th><th>País</th><th>Género</th><th>Saldo</th><th>Registro</th></tr></thead><tbody>
-          {profiles.map(profile=>{const wallet=walletByUser.get(profile.id);return <tr key={profile.id}><td><strong>{profile.full_name||profile.display_name||"Sin nombre"}</strong><span>{profile.id.slice(0,8)}…</span></td><td>{profile.country_code||"—"}</td><td>{profile.gender||"—"}</td><td><b className="admin-money">{money(wallet?.coins)}</b></td><td>{new Date(profile.created_at).toLocaleDateString("es-NI")}</td></tr>})}
+        <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Usuario</th><th>País</th><th>Género</th><th>Saldo</th><th>Registro</th><th>Acciones</th></tr></thead><tbody>
+          {profiles.map(profile=>{const wallet=walletByUser.get(profile.id);const busy=deletingUserId===profile.id;return <tr key={profile.id}><td><strong>{profile.full_name||profile.display_name||"Sin nombre"}</strong><span>{profile.public_id||"—"}</span></td><td>{profile.country_code||"—"}</td><td>{profile.gender||"—"}</td><td><b className="admin-money">{money(wallet?.coins)}</b></td><td>{new Date(profile.created_at).toLocaleDateString("es-NI")}</td><td><button className="admin-delete-user" disabled={busy} onClick={()=>deleteUser(profile)}>{busy?<LoaderCircle className="spin" size={14}/>:"Eliminar"}</button></td></tr>})}
         </tbody></table></div>
       </section>}
 
