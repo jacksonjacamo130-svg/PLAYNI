@@ -19,6 +19,7 @@ export default function ProfilePage(){
   const [birthDate,setBirthDate]=useState("No especificada");
   const [gender,setGender]=useState("No especificado");
   const [userId,setUserId]=useState("");
+  const [publicId,setPublicId]=useState("");
   const [isAdmin,setIsAdmin]=useState(false);
 
   useEffect(()=>{(async()=>{
@@ -28,7 +29,8 @@ export default function ProfilePage(){
     setUserId(user.id);
     const {data:adminRow}=await supabase.from("admin_users").select("user_id").eq("user_id",user.id).maybeSingle();
     setIsAdmin(!!adminRow);
-    const {data}=await supabase.from("profiles").select("full_name,display_name,country_code,birth_date,gender").eq("id",user.id).maybeSingle();
+    const {data}=await supabase.from("profiles").select("public_id,full_name,display_name,country_code,birth_date,gender").eq("id",user.id).maybeSingle();
+    setPublicId(data?.public_id??"");
     setName(data?.full_name?.trim()||data?.display_name||"Jugador");
     const code=(data?.country_code??"").toUpperCase();
     setCountry(countryNames[code]||code||"No especificado");
@@ -54,7 +56,7 @@ export default function ProfilePage(){
     <section className="profile-content">
       <div className="profile-intro">
         <span className="eyebrow">MI PERFIL</span><h1>{name}</h1>
-        <p>ID de usuario · <strong>{userId||"Cargando..."}</strong></p>
+        <p>ID de usuario · <strong>{publicId||"Cargando..."}</strong></p>
       </div>
       <section className="profile-section">
         <div className="profile-section-title"><UserRound size={17}/><span>DATOS PERSONALES</span></div>
