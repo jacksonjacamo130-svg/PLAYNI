@@ -136,7 +136,7 @@ export default function LoginPage() {
 
     try {
       const rawNonceBytes = crypto.getRandomValues(new Uint8Array(32));
-      const rawNonce = btoa(String.fromCharCode(...rawNonceBytes));
+      const rawNonce = btoa(String.fromCharCode(...Array.from(rawNonceBytes)));
       const hashBuffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(rawNonce));
       const hashedNonce = Array.from(new Uint8Array(hashBuffer)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
       googleNonceRef.current = rawNonce;
