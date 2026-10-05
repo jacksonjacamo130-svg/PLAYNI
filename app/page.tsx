@@ -21,12 +21,10 @@ export default function HomePage(){
   useEffect(()=>{
     let cancelled=false;
     let loadedUserId:string|null=null;
-    let redirectTimer:ReturnType<typeof setTimeout>|null=null;
 
     const loadHome=async(session:NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>)=>{
       if(cancelled || loadedUserId===session.user.id)return;
       loadedUserId=session.user.id;
-      if(redirectTimer){clearTimeout(redirectTimer);redirectTimer=null;}
       setLoading(false);
 
       const offersPromise = fetch("/api/offers",{headers:{Authorization:"Bearer "+session.access_token}})
@@ -52,31 +50,19 @@ export default function HomePage(){
       if(session) void loadHome(session as NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>);
     });
 
-    const authHandoff = typeof window !== "undefined" && sessionStorage.getItem("playni_google_handoff") === "1";
-
     const resolveSession = async()=>{
-      for(let attempt=0; attempt<(authHandoff ? 40 : 3); attempt++){
-        const {data:{session}}=await supabase.auth.getSession();
-        if(cancelled)return;
-        if(session){
-          sessionStorage.removeItem("playni_google_handoff");
-          void loadHome(session as NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>);
-          return;
-        }
-        await new Promise(resolve=>setTimeout(resolve,150));
-      }
-
+      const {data:{session}}=await supabase.auth.getSession();
       if(cancelled)return;
-      sessionStorage.removeItem("playni_google_handoff");
-      redirectTimer=setTimeout(()=>{
-        if(!cancelled) window.location.replace("/login");
-      },500);
+      if(session){
+        void loadHome(session as NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>);
+        return;
+      }
+      window.location.replace("/login");
     };
 
     return()=>{
       cancelled=true;
       subscription.unsubscribe();
-      if(redirectTimer)clearTimeout(redirectTimer);
     };
   },[]);
 
