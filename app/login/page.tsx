@@ -91,7 +91,7 @@ export default function LoginPage() {
       if (resetError) return setError("No pudimos cambiar la contraseña. Abre nuevamente el enlace de recuperación desde tu correo.");
       setMessage("Contraseña actualizada correctamente. Ya puedes continuar en PLAYNI.");
       window.history.replaceState({}, "", "/login");
-      setTimeout(() => { window.location.href = "/"; }, 700);
+      setTimeout(() => { router.replace("/"); }, 700);
       return;
     }
 
@@ -123,7 +123,7 @@ export default function LoginPage() {
     });
     setLoading(false);
     if (signUpError) return setError(signUpError.message);
-    if (data.session) { window.location.href = "/"; return; }
+    if (data.session) { router.replace("/"); return; }
     setMessage("Cuenta creada. Revisa tu correo para confirmar la cuenta y después inicia sesión.");
     setMode("login");
   }
