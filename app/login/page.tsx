@@ -178,18 +178,16 @@ export default function LoginPage() {
         }
       });
 
-      const buttonWidth = Math.min(400, Math.max(240, Math.floor(googleButtonRef.current.clientWidth)));
       googleButtonRef.current.innerHTML = "";
       window.google.accounts.id.renderButton(googleButtonRef.current, {
         type: "standard",
         theme: "outline",
-        // Medium evita el botón personalizado de Google que muestra la cuenta/email.
-        // Google mantiene el texto oficial "Continuar con Google".
+        // Mantiene el botón oficial de Google y evita mostrar una cuenta fija.
         size: "medium",
         text: "continue_with",
         shape: "rectangular",
         logo_alignment: "left",
-        width: buttonWidth,
+        width: 240,
         locale: "es_419"
       });
     } catch {
