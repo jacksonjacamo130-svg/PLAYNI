@@ -40,6 +40,7 @@ export default function LoginPage() {
   const googleButtonRef = useRef<HTMLDivElement>(null);
   const googleNonceRef = useRef<string | null>(null);
   const googleIdentityInitializedRef = useRef(false);
+  const googleButtonObserverRef = useRef<MutationObserver | null>(null);
   const selectedCountry = useMemo(() => countries.find((item) => item.code === country) ?? countries[0], [country]);
   const fullPhone = () => selectedCountry.dial + phone.replace(/\D/g, "");
 
@@ -135,6 +136,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (mode !== "login") {
       googleIdentityInitializedRef.current = false;
+      googleButtonObserverRef.current?.disconnect();
       setGoogleButtonReady(false);
       return;
     }
@@ -176,29 +178,56 @@ export default function LoginPage() {
           }
 
           if (data.session) {
-            // Explicitly persist the session before navigating. This prevents
-            // the home route from reading an empty storage during the auth handoff.
-            const { data: persisted } = await supabase.auth.setSession({
-              access_token: data.session.access_token,
-              refresh_token: data.session.refresh_token
-            });
+            // signInWithIdToken already stores the session. Do not call
+            // setSession again with the same refresh token, because refresh-token
+            // rotation can invalidate the token during the route handoff.
+            let confirmedSession = null;
+            for (let attempt = 0; attempt < 20; attempt++) {
+              const { data: current } = await supabase.auth.getSession();
+              if (current.session?.user.id === data.session.user.id) {
+                confirmedSession = current.session;
+                break;
+              }
+              await new Promise(resolve => setTimeout(resolve, 100));
+            }
 
-            if (persisted.session) {
+            if (confirmedSession) {
               sessionStorage.setItem("playni_google_handoff", "1");
-              sessionStorage.setItem("playni_google_access_token", persisted.session.access_token);
-              sessionStorage.setItem("playni_google_refresh_token", persisted.session.refresh_token);
               router.replace("/");
               return;
             }
           }
 
           setGoogleLoading(false);
-          setError("Google no pudo completar la sesión. Inténtalo de nuevo.");
+          setError("Google inició sesión, pero no pudimos confirmar la sesión local. Inténtalo de nuevo.");
         }
       });
 
       googleButtonRef.current.innerHTML = "";
       setGoogleButtonReady(false);
+      googleButtonObserverRef.current?.disconnect();
+
+      const revealWhenGoogleIsPainted = () => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setGoogleButtonReady(true);
+          });
+        });
+      };
+
+      const watchGoogleIframe = () => {
+        if (!googleButtonRef.current) return false;
+        const iframe = googleButtonRef.current.querySelector("iframe");
+        if (!iframe) return false;
+        iframe.addEventListener("load", revealWhenGoogleIsPainted, { once: true });
+        return true;
+      };
+
+      googleButtonObserverRef.current = new MutationObserver(() => {
+        if (watchGoogleIframe()) googleButtonObserverRef.current?.disconnect();
+      });
+      googleButtonObserverRef.current.observe(googleButtonRef.current, { childList: true, subtree: true });
+
       window.google.accounts.id.renderButton(googleButtonRef.current, {
         type: "standard",
         theme: "outline",
@@ -210,9 +239,15 @@ export default function LoginPage() {
         width: 240,
         locale: "es_419"
       });
-      // Wait until the Google iframe has had time to finish painting before
-      // revealing it. This prevents the one-frame blink seen during GIS mount.
-      setTimeout(() => setGoogleButtonReady(true), 250);
+
+      if (watchGoogleIframe()) {
+        googleButtonObserverRef.current?.disconnect();
+      } else {
+        // Safety net only: keep the button hidden while Google finishes mounting.
+        setTimeout(() => {
+          if (!googleButtonReady) revealWhenGoogleIsPainted();
+        }, 1500);
+      }
     } catch {
       setError("No pudimos preparar el acceso con Google. Inténtalo de nuevo.");
     }
@@ -285,7 +320,7 @@ export default function LoginPage() {
           <button className="auth-button" type="submit" disabled={loading || googleLoading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : mode === "reset" ? "CAMBIAR CONTRASEÑA" : "CREAR CUENTA"}</button>
           {mode === "login" && <>
             <div className="auth-divider"><span>o</span></div>
-            <div className="google-button-wrap" style={{ visibility: googleButtonReady ? "visible" : "hidden" }} ref={googleButtonRef} aria-label="Continuar con Google" />
+            <div className={`google-button-wrap${googleButtonReady ? " google-ready" : ""}`} style={{ pointerEvents: googleButtonReady ? "auto" : "none" }} ref={googleButtonRef} aria-label="Continuar con Google" />
           </>}
         {mode === "login" && <button type="button" className="auth-link-button" onClick={async () => {
           if (!email.trim() || !email.includes("@")) return setError("Escribe primero tu correo electrónico.");
