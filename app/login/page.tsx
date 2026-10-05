@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import Script from "next/script";
 import { CheckCircle2, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
@@ -12,6 +13,20 @@ const countries = [
 ];
 const logoUrl = "https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png";
 const PLAYNI_URL = "https://playniapp.site";
+const GOOGLE_CLIENT_ID = "319808410825-ie1dr4ft8t9g02ij06u3g396tsnep2k1.apps.googleusercontent.com";
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (options: Record<string, unknown>) => void;
+          renderButton: (element: HTMLElement, options: Record<string, unknown>) => void;
+        };
+      };
+    };
+  }
+}
 
 export default function LoginPage() {
   const [mode, setMode] = useState<"login" | "register" | "reset">("login");
@@ -20,6 +35,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedLegal, setAcceptedLegal] = useState(false);
   const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [confirmingEmail, setConfirmingEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("confirmed") === "1"), [message, setMessage] = useState(""), [error, setError] = useState("");
+  const googleButtonRef = useRef<HTMLDivElement>(null);
+  const googleNonceRef = useRef<string | null>(null);
   const selectedCountry = useMemo(() => countries.find((item) => item.code === country) ?? countries[0], [country]);
   const fullPhone = () => selectedCountry.dial + phone.replace(/\D/g, "");
 
@@ -57,20 +74,6 @@ export default function LoginPage() {
       };
     }
 
-    const hasOAuthReturn = window.location.hash.includes("access_token") || params.has("code");
-    if (!hasOAuthReturn) return;
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
-        window.location.replace("/?oauth_return=google");
-      }
-    });
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) window.location.replace("/");
-    });
-
-    return () => subscription.unsubscribe();
   }, []);
 
   async function submit(event: FormEvent) {
@@ -122,14 +125,66 @@ export default function LoginPage() {
     setMode("login");
   }
 
-  async function signInWithGoogle() {
-    setGoogleLoading(true); setError(""); setMessage("");
-    const { error: googleError } = await supabase.auth.signInWithOAuth({
-      provider: "google"
-    });
-    if (googleError) {
-      setGoogleLoading(false);
-      return setError("No pudimos iniciar sesión con Google. Inténtalo de nuevo.");
+  async function prepareGoogleIdentity() {
+    if (!window.google || !googleButtonRef.current) return;
+
+    try {
+      const rawNonceBytes = crypto.getRandomValues(new Uint8Array(32));
+      const rawNonce = btoa(String.fromCharCode(...rawNonceBytes));
+      const hashBuffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(rawNonce));
+      const hashedNonce = Array.from(new Uint8Array(hashBuffer)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+      googleNonceRef.current = rawNonce;
+
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        nonce: hashedNonce,
+        callback: async (response: { credential: string }) => {
+          setGoogleLoading(true);
+          setError("");
+          setMessage("");
+
+          const nonce = googleNonceRef.current;
+          const { data, error: googleError } = await supabase.auth.signInWithIdToken({
+            provider: "google",
+            token: response.credential,
+            ...(nonce ? { nonce } : {})
+          });
+
+          if (googleError) {
+            setGoogleLoading(false);
+            return setError("No pudimos iniciar sesión con Google. Inténtalo de nuevo.");
+          }
+
+          if (data.session) {
+            window.location.replace("/");
+            return;
+          }
+
+          const { data: sessionData } = await supabase.auth.getSession();
+          if (sessionData.session) {
+            window.location.replace("/");
+            return;
+          }
+
+          setGoogleLoading(false);
+          setError("Google no pudo completar la sesión. Inténtalo de nuevo.");
+        }
+      });
+
+      const buttonWidth = Math.min(400, Math.max(240, Math.floor(googleButtonRef.current.clientWidth)));
+      googleButtonRef.current.innerHTML = "";
+      window.google.accounts.id.renderButton(googleButtonRef.current, {
+        type: "standard",
+        theme: "outline",
+        size: "large",
+        text: "continue_with",
+        shape: "rectangular",
+        logo_alignment: "left",
+        width: buttonWidth,
+        locale: "es_419"
+      });
+    } catch {
+      setError("No pudimos preparar el acceso con Google. Inténtalo de nuevo.");
     }
   }
 
@@ -150,6 +205,12 @@ export default function LoginPage() {
 
   return (
     <main className="auth-page">
+      <Script
+        src="https://accounts.google.com/gsi/client?hl=es-419"
+        strategy="afterInteractive"
+        onLoad={prepareGoogleIdentity}
+        onError={() => setError("No pudimos cargar el acceso de Google. Inténtalo de nuevo.")}
+      />
       <section className="auth-card">
         <div className="auth-logo-wrap"><img className="auth-logo" src={logoUrl} alt="PLAYNI" /></div>
         <div className="auth-heading">
@@ -194,15 +255,8 @@ export default function LoginPage() {
           <button className="auth-button" type="submit" disabled={loading || googleLoading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : mode === "reset" ? "CAMBIAR CONTRASEÑA" : "CREAR CUENTA"}</button>
           {mode === "login" && <>
             <div className="auth-divider"><span>o</span></div>
-            <button type="button" className="google-button" onClick={signInWithGoogle} disabled={loading || googleLoading}>
-              {googleLoading ? <Loader2 className="spin" size={19} /> : <svg className="google-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path fill="#4285F4" d="M21.35 12.27c0-.68-.06-1.33-.17-1.95H12v3.69h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.7 2.91-4.2 2.91-7.13Z"/>
-                <path fill="#34A853" d="M12 21.73c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.55 0-4.71-1.72-5.49-4.03H3.27v2.53A9.74 9.74 0 0 0 12 21.73Z"/>
-                <path fill="#FBBC05" d="M6.51 13.81A5.86 5.86 0 0 1 6.2 12c0-.63.11-1.25.31-1.81V7.66H3.27A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.05 1.02 4.34l3.24-2.53Z"/>
-                <path fill="#EA4335" d="M12 6.16c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.83 3.23 14.63 2.27 12 2.27a9.74 9.74 0 0 0-8.73 5.39l3.24 2.53c.78-2.31 2.94-4.03 5.49-4.03Z"/>
-              </svg>}
-              {googleLoading ? "CONECTANDO CON GOOGLE..." : "CONTINUAR CON GOOGLE"}
-            </button>
+            <div className={googleLoading ? "google-button-wrap is-loading" : "google-button-wrap"} ref={googleButtonRef} aria-label="Continuar con Google" />
+            {googleLoading && <div className="google-status"><Loader2 className="spin" size={16} /> Conectando con Google...</div>}
           </>}
         {mode === "login" && <button type="button" className="auth-link-button" onClick={async () => {
           if (!email.trim() || !email.includes("@")) return setError("Escribe primero tu correo electrónico.");
