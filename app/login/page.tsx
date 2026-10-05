@@ -176,8 +176,17 @@ export default function LoginPage() {
           }
 
           if (data.session) {
-            router.replace("/");
-            return;
+            // Explicitly persist the session before navigating. This prevents
+            // the home route from reading an empty storage during the auth handoff.
+            const { data: persisted } = await supabase.auth.setSession({
+              access_token: data.session.access_token,
+              refresh_token: data.session.refresh_token
+            });
+
+            if (persisted.session) {
+              router.replace("/");
+              return;
+            }
           }
 
           setGoogleLoading(false);
