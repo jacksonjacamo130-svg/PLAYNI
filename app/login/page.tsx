@@ -163,12 +163,23 @@ export default function LoginPage() {
           }
 
           if (data.session) {
-            window.location.replace("/");
-            return;
+            // Give Supabase a moment to finish persisting the session before
+            // leaving the login page. This prevents / from briefly seeing no
+            // session and bouncing the user back to /login.
+            for (let attempt = 0; attempt < 10; attempt++) {
+              const { data: sessionData } = await supabase.auth.getSession();
+              if (sessionData.session) {
+                await new Promise((resolve) => setTimeout(resolve, 250));
+                window.location.replace("/");
+                return;
+              }
+              await new Promise((resolve) => setTimeout(resolve, 150));
+            }
           }
 
           const { data: sessionData } = await supabase.auth.getSession();
           if (sessionData.session) {
+            await new Promise((resolve) => setTimeout(resolve, 250));
             window.location.replace("/");
             return;
           }
