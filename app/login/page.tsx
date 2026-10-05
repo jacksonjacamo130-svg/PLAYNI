@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { CheckCircle2, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { supabase } from "../../lib/supabase";
@@ -29,6 +30,7 @@ declare global {
 }
 
 export default function LoginPage() {
+  const router = useRouter();
   const [mode, setMode] = useState<"login" | "register" | "reset">("login");
   const [fullName, setFullName] = useState(""), [birthDate, setBirthDate] = useState(""), [gender, setGender] = useState(""), [country, setCountry] = useState("NI");
   const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
@@ -111,7 +113,7 @@ export default function LoginPage() {
       const { error: loginError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
       setLoading(false);
       if (loginError) return setError("Correo o contraseña incorrectos.");
-      window.location.href = "/";
+      router.replace("/");
       return;
     }
 
@@ -175,7 +177,7 @@ export default function LoginPage() {
             for (let attempt = 0; attempt < 5; attempt++) {
               const { data: sessionData } = await supabase.auth.getSession();
               if (sessionData.session) {
-                window.location.replace("/");
+                router.replace("/");
                 return;
               }
               await new Promise((resolve) => setTimeout(resolve, 100));
@@ -184,7 +186,7 @@ export default function LoginPage() {
 
           const { data: sessionData } = await supabase.auth.getSession();
           if (sessionData.session) {
-            window.location.replace("/");
+            router.replace("/");
             return;
           }
 
