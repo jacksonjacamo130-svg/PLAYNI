@@ -34,7 +34,7 @@ export default function LoginPage() {
   const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedLegal, setAcceptedLegal] = useState(false);
-  const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [confirmingEmail, setConfirmingEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("confirmed") === "1"), [googleScriptReady, setGoogleScriptReady] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
+  const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [googleButtonReady, setGoogleButtonReady] = useState(false), [confirmingEmail, setConfirmingEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("confirmed") === "1"), [googleScriptReady, setGoogleScriptReady] = useState(false), [message, setMessage] = useState(""), [error, setError] = useState("");
   const googleButtonRef = useRef<HTMLDivElement>(null);
   const googleNonceRef = useRef<string | null>(null);
   const googleIdentityInitializedRef = useRef(false);
@@ -129,6 +129,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (mode !== "login") {
       googleIdentityInitializedRef.current = false;
+      setGoogleButtonReady(false);
       return;
     }
     if (googleScriptReady && !googleIdentityInitializedRef.current) {
@@ -193,6 +194,7 @@ export default function LoginPage() {
       });
 
       googleButtonRef.current.innerHTML = "";
+      setGoogleButtonReady(false);
       window.google.accounts.id.renderButton(googleButtonRef.current, {
         type: "standard",
         theme: "outline",
@@ -204,6 +206,7 @@ export default function LoginPage() {
         width: 240,
         locale: "es_419"
       });
+      requestAnimationFrame(() => setGoogleButtonReady(true));
     } catch {
       setError("No pudimos preparar el acceso con Google. Inténtalo de nuevo.");
     }
@@ -276,7 +279,7 @@ export default function LoginPage() {
           <button className="auth-button" type="submit" disabled={loading || googleLoading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : mode === "reset" ? "CAMBIAR CONTRASEÑA" : "CREAR CUENTA"}</button>
           {mode === "login" && <>
             <div className="auth-divider"><span>o</span></div>
-            <div className={googleLoading ? "google-button-wrap is-loading" : "google-button-wrap"} ref={googleButtonRef} aria-label="Continuar con Google" />
+            <div className="google-button-wrap" style={{ visibility: googleButtonReady ? "visible" : "hidden" }} ref={googleButtonRef} aria-label="Continuar con Google" />
           </>}
         {mode === "login" && <button type="button" className="auth-link-button" onClick={async () => {
           if (!email.trim() || !email.includes("@")) return setError("Escribe primero tu correo electrónico.");
