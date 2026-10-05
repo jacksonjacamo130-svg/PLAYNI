@@ -24,19 +24,12 @@ export default function HomePage(){
     const loadHome=async()=>{
       let session=null;
 
-      // Give Supabase a few short chances to restore the persisted session
-      // before redirecting. This prevents a visible bounce back to /login
-      // immediately after Google GIS finishes.
-      for(let attempt=0; attempt<5; attempt++){
-        const {data:{session:currentSession}}=await supabase.auth.getSession();
-        if(currentSession){
-          session=currentSession;
-          break;
-        }
-        await new Promise(resolve=>setTimeout(resolve, attempt===0 ? 50 : 150));
-      }
+      // Restore the persisted Supabase session directly from local storage.
+      // Avoid an artificial polling screen after login.
+      const {data:{session:currentSession}}=await supabase.auth.getSession();
 
       if(cancelled)return;
+      session=currentSession;
       if(!session){window.location.replace("/login");return;}
 
       // Authentication is ready; render the app immediately.
@@ -68,18 +61,7 @@ export default function HomePage(){
 
   const filtered=offers.filter(o=>(o.title+" "+o.category+" "+o.description).toLowerCase().includes(query.toLowerCase()));
 
-  if(loading) return (
-    <main className="auth-page">
-      <section className="auth-card">
-        <div className="auth-logo-wrap"><img className="auth-logo" src="https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png" alt="PLAYNI" /></div>
-        <div className="auth-heading">
-          <h1>Entrando a PLAYNI</h1>
-          <p>Estamos preparando tu cuenta...</p>
-        </div>
-        <div style={{display:"flex",justifyContent:"center",paddingTop:12}}><LoaderCircle className="spin" size={28} /></div>
-      </section>
-    </main>
-  );
+  if(loading) return <main className="app-shell discover-page" aria-hidden="true" />;
 
   return <main className="app-shell discover-page">
     <header className="topbar discover-topbar">
