@@ -35,7 +35,7 @@ export default function LoginPage() {
   const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedLegal, setAcceptedLegal] = useState(false);
-  const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [googleButtonReady, setGoogleButtonReady] = useState(false), [confirmingEmail, setConfirmingEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("confirmed") === "1"), [message, setMessage] = useState(""), [error, setError] = useState("");
+  const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [confirmingEmail, setConfirmingEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("confirmed") === "1"), [message, setMessage] = useState(""), [error, setError] = useState("");
   const googleButtonRef = useRef<HTMLDivElement>(null);
   const googleNonceRef = useRef<string | null>(null);
   const googleIdentityInitializedRef = useRef(false);
@@ -134,7 +134,6 @@ export default function LoginPage() {
   useLayoutEffect(() => {
     if (mode !== "login") {
       googleIdentityInitializedRef.current = false;
-      setGoogleButtonReady(false);
       return;
     }
     if (window.google && !googleIdentityInitializedRef.current) {
@@ -192,38 +191,7 @@ export default function LoginPage() {
         }
       });
 
-      setGoogleButtonReady(false);
       googleButtonRef.current.innerHTML = "";
-
-      let revealTimer: number | null = null;
-      let fallbackTimer: number | null = null;
-      let revealed = false;
-
-      const revealStableButton = () => {
-        if (revealed) return;
-        revealed = true;
-        if (revealTimer !== null) window.clearTimeout(revealTimer);
-        if (fallbackTimer !== null) window.clearTimeout(fallbackTimer);
-        setGoogleButtonReady(true);
-      };
-
-      const scheduleReveal = () => {
-        if (revealTimer !== null) window.clearTimeout(revealTimer);
-        revealTimer = window.setTimeout(revealStableButton, 600);
-      };
-
-      const observeGoogleButton = () => {
-        const iframe = googleButtonRef.current?.querySelector("iframe");
-        if (!iframe) return false;
-        iframe.addEventListener("load", scheduleReveal, { once: true });
-        return true;
-      };
-
-      const observer = new MutationObserver(() => {
-        if (observeGoogleButton()) observer.disconnect();
-      });
-
-      observer.observe(googleButtonRef.current, { childList: true, subtree: true });
 
       window.google.accounts.id.renderButton(googleButtonRef.current, {
         type: "standard",
@@ -236,11 +204,6 @@ export default function LoginPage() {
         logo_alignment: "left",
         locale: "es_419"
       });
-
-      observeGoogleButton();
-
-      // Evita dejar el área invisible indefinidamente si el iframe no dispara load.
-      fallbackTimer = window.setTimeout(revealStableButton, 2500);
 
     } catch {
       setError("No pudimos preparar el acceso con Google. Inténtalo de nuevo.");
@@ -308,7 +271,7 @@ export default function LoginPage() {
           <button className="auth-button" type="submit" disabled={loading || googleLoading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : mode === "reset" ? "CAMBIAR CONTRASEÑA" : "CREAR CUENTA"}</button>
           {mode === "login" && <>
             <div className="auth-divider"><span>o</span></div>
-            <div className={`google-button-wrap${googleButtonReady ? " google-ready" : ""}`} ref={googleButtonRef} aria-label="Continuar con Google" />
+            <div className="google-button-wrap google-ready" ref={googleButtonRef} aria-label="Continuar con Google" />
           </>}
         {mode === "login" && <button type="button" className="auth-link-button" onClick={async () => {
           if (!email.trim() || !email.includes("@")) return setError("Escribe primero tu correo electrónico.");
