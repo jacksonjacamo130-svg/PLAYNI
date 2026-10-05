@@ -175,24 +175,11 @@ export default function LoginPage() {
           }
 
           if (data.session) {
-            // signInWithIdToken already stores the session. Do not call
-            // setSession again with the same refresh token, because refresh-token
-            // rotation can invalidate the token during the route handoff.
-            let confirmedSession = null;
-            for (let attempt = 0; attempt < 20; attempt++) {
-              const { data: current } = await supabase.auth.getSession();
-              if (current.session?.user.id === data.session.user.id) {
-                confirmedSession = current.session;
-                break;
-              }
-              await new Promise(resolve => setTimeout(resolve, 100));
-            }
-
-            if (confirmedSession) {
-              sessionStorage.setItem("playni_google_handoff", "1");
-              window.location.replace("/");
-              return;
-            }
+            // signInWithIdToken already establishes and persists the Supabase session.
+            // Do not wait for a second getSession() round-trip and do not force a
+            // full document reload; navigate directly inside the Next.js app.
+            router.replace("/");
+            return;
           }
 
           setGoogleLoading(false);
