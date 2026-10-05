@@ -135,6 +135,7 @@ export default function LoginPage() {
     const cleanupGoogleButton = () => {
       const container = googleButtonRef.current;
       if (container) container.innerHTML = "";
+      googleIdentityInitializedRef.current = false;
     };
 
     if (mode !== "login") {
@@ -283,7 +284,7 @@ export default function LoginPage() {
           <button className="auth-button" type="submit" disabled={loading || googleLoading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : mode === "reset" ? "CAMBIAR CONTRASEÑA" : "CREAR CUENTA"}</button>
           {mode === "login" && <>
             <div className="auth-divider"><span>o</span></div>
-            <div className="google-button-wrap" ref={googleButtonRef} aria-label="Continuar con Google">
+            <div className="google-button-wrap" aria-label="Continuar con Google">
               <div className="google-button-visual" aria-hidden="true">
                 <svg className="google-g-mark" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M21.35 12.27c0-.79-.07-1.55-.21-2.27H12v4.3h5.21c-.22 1.17-.9 2.17-1.91 2.84v2.36h3.1c1.81-1.67 2.85-4.13 2.85-7.23Z" fill="#4285F4"/>
@@ -293,6 +294,7 @@ export default function LoginPage() {
                 </svg>
                 <span>Continuar con Google</span>
               </div>
+              <div className="google-button-native" ref={googleButtonRef} aria-hidden="true" />
             </div>
           </>}
         {mode === "login" && <button type="button" className="auth-link-button" onClick={async () => {
