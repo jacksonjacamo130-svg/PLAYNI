@@ -185,6 +185,8 @@ export default function LoginPage() {
 
             if (persisted.session) {
               sessionStorage.setItem("playni_google_handoff", "1");
+              sessionStorage.setItem("playni_google_access_token", persisted.session.access_token);
+              sessionStorage.setItem("playni_google_refresh_token", persisted.session.refresh_token);
               router.replace("/");
               return;
             }
