@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Coins, ChevronRight, Clock3, LoaderCircle, Search, ShieldCheck, Sparkles, Gamepad2, ListChecks } from "lucide-react";
 import { supabase } from "../lib/supabase";
@@ -16,29 +16,66 @@ type PlayOffer = {
 export default function HomePage(){
   const [name,setName]=useState("Jugador"), [balance,setBalance]=useState("0.00"),
     [offers,setOffers]=useState<PlayOffer[]>([]), [startedCount,setStartedCount]=useState(0),
-    [loading,setLoading]=useState(true), [query,setQuery]=useState("");
+    [loading,setLoading]=useState(true), [dataLoading,setDataLoading]=useState(true), [query,setQuery]=useState("");
 
   useEffect(()=>{
-    (async()=>{
-    const {data:{session}}=await supabase.auth.getSession();
-    if(!session){window.location.replace("/login");return;}
-    const [{data:p},{data:w},{count}]=await Promise.all([
-      supabase.from("profiles").select("full_name,display_name").eq("id",session.user.id).maybeSingle(),
-      supabase.from("wallets").select("coins").eq("user_id",session.user.id).maybeSingle(),
-      supabase.from("user_offers").select("id",{count:"exact",head:true}).eq("user_id",session.user.id).eq("status","active")
-    ]);
-    setName(p?.full_name?.trim().split(" ")[0]||p?.display_name||"Jugador");
-    setBalance(((w?.coins??0)/1000).toFixed(2));
-    setStartedCount(count??0);
-    try{
-      const res=await fetch("/api/offers",{headers:{Authorization:"Bearer "+session.access_token}});
-      const data=await res.json();
-      setOffers(data.offers??[]);
-    }catch{}
-    setLoading(false);
-  })()},[]);
+    let cancelled=false;
+    let loadedUserId:string|null=null;
+
+    const loadHome=async(session:NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>)=>{
+      if(cancelled || loadedUserId===session.user.id)return;
+      loadedUserId=session.user.id;
+      setLoading(false);
+
+      const offersPromise = fetch("/api/offers",{headers:{Authorization:"Bearer "+session.access_token}})
+        .then(async res => res.ok ? res.json() : {offers:[]})
+        .catch(() => ({offers:[]}));
+
+      const [{data:p},{data:w},{count},offersData]=await Promise.all([
+        supabase.from("profiles").select("full_name,display_name").eq("id",session.user.id).maybeSingle(),
+        supabase.from("wallets").select("coins").eq("user_id",session.user.id).maybeSingle(),
+        supabase.from("user_offers").select("id",{count:"exact",head:true}).eq("user_id",session.user.id).eq("status","active"),
+        offersPromise
+      ]);
+
+      if(cancelled)return;
+      setName(p?.full_name?.trim().split(" ")[0]||p?.display_name||"Jugador");
+      setBalance(((w?.coins??0)/1000).toFixed(2));
+      setStartedCount(count??0);
+      setOffers(offersData.offers??[]);
+      setDataLoading(false);
+    };
+
+    const {data:{subscription}}=supabase.auth.onAuthStateChange((_event,session)=>{
+      if(session) void loadHome(session as NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>);
+    });
+
+    const resolveSession = async()=>{
+      for(let attempt=0; attempt<25; attempt++){
+        const {data:{session}}=await supabase.auth.getSession();
+        if(cancelled)return;
+        if(session){
+          void loadHome(session as NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]>);
+          return;
+        }
+        await new Promise(resolve=>setTimeout(resolve,100));
+      }
+
+      if(cancelled)return;
+      window.location.replace("/login");
+    };
+
+    void resolveSession();
+
+    return()=>{
+      cancelled=true;
+      subscription.unsubscribe();
+    };
+  },[]);
 
   const filtered=offers.filter(o=>(o.title+" "+o.category+" "+o.description).toLowerCase().includes(query.toLowerCase()));
+
+  if(loading) return <main className="app-shell discover-page auth-boot" aria-label="Cargando PLAYNI"><LoaderCircle size={27}/></main>;
 
   return <main className="app-shell discover-page">
     <header className="topbar discover-topbar">
@@ -74,7 +111,7 @@ export default function HomePage(){
         <span className="discover-count">{offers.length} disponibles</span>
       </div>
 
-      {loading ? <div className="discover-loading"><LoaderCircle className="spin" size={25}/><span>Buscando ofertas disponibles...</span></div> :
+      {dataLoading ? <div className="discover-loading"><LoaderCircle className="spin" size={25}/><span>Buscando ofertas disponibles...</span></div> :
       filtered.length ? <div className="discover-grid">{filtered.map(o=><article className="discover-card" key={o.id}>
         <div className="discover-cover">
           {o.icon?<img src={o.icon} alt=""/>:<div className="discover-cover-placeholder"><Gamepad2 size={48}/></div>}

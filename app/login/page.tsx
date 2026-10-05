@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { CheckCircle2, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
@@ -12,18 +13,40 @@ const countries = [
 ];
 const logoUrl = "https://raw.githubusercontent.com/jacksonjacamo130-svg/PLAYNI/main/logo-playni.png";
 const PLAYNI_URL = "https://playniapp.site";
+const GOOGLE_CLIENT_ID = "319808410825-ie1dr4ft8t9g02ij06u3g396tsnep2k1.apps.googleusercontent.com";
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (options: Record<string, unknown>) => void;
+          renderButton: (element: HTMLElement, options: Record<string, unknown>) => void;
+        };
+      };
+    };
+  }
+}
 
 export default function LoginPage() {
+  const router = useRouter();
   const [mode, setMode] = useState<"login" | "register" | "reset">("login");
   const [fullName, setFullName] = useState(""), [birthDate, setBirthDate] = useState(""), [gender, setGender] = useState(""), [country, setCountry] = useState("NI");
   const [phone, setPhone] = useState(""), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false), [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedLegal, setAcceptedLegal] = useState(false);
   const [loading, setLoading] = useState(false), [googleLoading, setGoogleLoading] = useState(false), [confirmingEmail, setConfirmingEmail] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("confirmed") === "1"), [message, setMessage] = useState(""), [error, setError] = useState("");
+  const googleButtonRef = useRef<HTMLDivElement>(null);
+  const googleNonceRef = useRef<string | null>(null);
+  const googleIdentityInitializedRef = useRef(false);
   const selectedCountry = useMemo(() => countries.find((item) => item.code === country) ?? countries[0], [country]);
   const fullPhone = () => selectedCountry.dial + phone.replace(/\D/g, "");
 
   function switchMode(next: "login" | "register" | "reset") { setMode(next); setError(""); setMessage(""); }
+  useEffect(() => {
+    router.prefetch("/");
+  }, [router]);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("reset") === "1") setMode("reset");
@@ -57,20 +80,6 @@ export default function LoginPage() {
       };
     }
 
-    const hasOAuthReturn = window.location.hash.includes("access_token") || params.has("code");
-    if (!hasOAuthReturn) return;
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
-        window.location.replace("/?oauth_return=google");
-      }
-    });
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) window.location.replace("/");
-    });
-
-    return () => subscription.unsubscribe();
   }, []);
 
   async function submit(event: FormEvent) {
@@ -85,7 +94,7 @@ export default function LoginPage() {
       if (resetError) return setError("No pudimos cambiar la contraseña. Abre nuevamente el enlace de recuperación desde tu correo.");
       setMessage("Contraseña actualizada correctamente. Ya puedes continuar en PLAYNI.");
       window.history.replaceState({}, "", "/login");
-      setTimeout(() => { window.location.href = "/"; }, 700);
+      setTimeout(() => { router.replace("/"); }, 700);
       return;
     }
 
@@ -107,7 +116,7 @@ export default function LoginPage() {
       const { error: loginError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
       setLoading(false);
       if (loginError) return setError("Correo o contraseña incorrectos.");
-      window.location.href = "/";
+      router.replace("/");
       return;
     }
 
@@ -117,19 +126,100 @@ export default function LoginPage() {
     });
     setLoading(false);
     if (signUpError) return setError(signUpError.message);
-    if (data.session) { window.location.href = "/"; return; }
+    if (data.session) { router.replace("/"); return; }
     setMessage("Cuenta creada. Revisa tu correo para confirmar la cuenta y después inicia sesión.");
     setMode("login");
   }
 
-  async function signInWithGoogle() {
-    setGoogleLoading(true); setError(""); setMessage("");
-    const { error: googleError } = await supabase.auth.signInWithOAuth({
-      provider: "google"
-    });
-    if (googleError) {
-      setGoogleLoading(false);
-      return setError("No pudimos iniciar sesión con Google. Inténtalo de nuevo.");
+  useLayoutEffect(() => {
+    const cleanupGoogleButton = () => {
+      const container = googleButtonRef.current;
+      if (container) container.innerHTML = "";
+      googleIdentityInitializedRef.current = false;
+    };
+
+    if (mode !== "login") {
+      cleanupGoogleButton();
+      googleIdentityInitializedRef.current = false;
+      return;
+    }
+
+    if (window.google && !googleIdentityInitializedRef.current) {
+      void prepareGoogleIdentity();
+      return cleanupGoogleButton;
+    }
+
+    let attempts = 0;
+    const retry = () => {
+      if (mode !== "login" || googleIdentityInitializedRef.current) return;
+      if (window.google) {
+        void prepareGoogleIdentity();
+        return;
+      }
+      if (attempts++ < 20) window.setTimeout(retry, 50);
+    };
+    retry();
+
+    return cleanupGoogleButton;
+  }, [mode]);
+
+  async function prepareGoogleIdentity() {
+    if (!window.google || !googleButtonRef.current || googleIdentityInitializedRef.current) return;
+    googleIdentityInitializedRef.current = true;
+
+    try {
+      const rawNonceBytes = crypto.getRandomValues(new Uint8Array(32));
+      const rawNonce = btoa(String.fromCharCode(...Array.from(rawNonceBytes)));
+      const hashBuffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(rawNonce));
+      const hashedNonce = Array.from(new Uint8Array(hashBuffer)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+      googleNonceRef.current = rawNonce;
+
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        auto_select: false,
+        nonce: hashedNonce,
+        callback: async (response: { credential: string }) => {
+          setGoogleLoading(true);
+          setError("");
+          setMessage("");
+
+          const nonce = googleNonceRef.current;
+          // Start Supabase authentication immediately, then leave the login route.
+          // The home route waits briefly for the persisted session before rendering.
+          const authPromise = supabase.auth.signInWithIdToken({
+            provider: "google",
+            token: response.credential,
+            ...(nonce ? { nonce } : {})
+          });
+
+          router.replace("/");
+
+          const { error: googleError } = await authPromise;
+          if (googleError) {
+            sessionStorage.setItem("playni_google_auth_error", "1");
+          }
+        }
+      });
+
+      const container = googleButtonRef.current;
+      if (!container) return;
+
+      container.innerHTML = "";
+
+      window.google.accounts.id.renderButton(container, {
+        type: "standard",
+        theme: "outline",
+        size: "medium",
+        width: 240,
+        // Mantiene el botón oficial de Google y evita mostrar una cuenta fija.
+        text: "continue_with",
+        shape: "rectangular",
+        logo_alignment: "left",
+        locale: "es_419"
+      });
+
+    } catch {
+      setError("No pudimos preparar el acceso con Google. Inténtalo de nuevo.");
     }
   }
 
@@ -194,15 +284,18 @@ export default function LoginPage() {
           <button className="auth-button" type="submit" disabled={loading || googleLoading}>{loading ? <Loader2 className="spin" size={19} /> : mode === "login" ? "INICIAR SESIÓN" : mode === "reset" ? "CAMBIAR CONTRASEÑA" : "CREAR CUENTA"}</button>
           {mode === "login" && <>
             <div className="auth-divider"><span>o</span></div>
-            <button type="button" className="google-button" onClick={signInWithGoogle} disabled={loading || googleLoading}>
-              {googleLoading ? <Loader2 className="spin" size={19} /> : <svg className="google-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path fill="#4285F4" d="M21.35 12.27c0-.68-.06-1.33-.17-1.95H12v3.69h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.7 2.91-4.2 2.91-7.13Z"/>
-                <path fill="#34A853" d="M12 21.73c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.55 0-4.71-1.72-5.49-4.03H3.27v2.53A9.74 9.74 0 0 0 12 21.73Z"/>
-                <path fill="#FBBC05" d="M6.51 13.81A5.86 5.86 0 0 1 6.2 12c0-.63.11-1.25.31-1.81V7.66H3.27A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.05 1.02 4.34l3.24-2.53Z"/>
-                <path fill="#EA4335" d="M12 6.16c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.83 3.23 14.63 2.27 12 2.27a9.74 9.74 0 0 0-8.73 5.39l3.24 2.53c.78-2.31 2.94-4.03 5.49-4.03Z"/>
-              </svg>}
-              {googleLoading ? "CONECTANDO CON GOOGLE..." : "CONTINUAR CON GOOGLE"}
-            </button>
+            <div className="google-button-wrap" aria-label="Continuar con Google">
+              <div className="google-button-visual" aria-hidden="true">
+                <svg className="google-g-mark" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M21.35 12.27c0-.79-.07-1.55-.21-2.27H12v4.3h5.21c-.22 1.17-.9 2.17-1.91 2.84v2.36h3.1c1.81-1.67 2.85-4.13 2.85-7.23Z" fill="#4285F4"/>
+                  <path d="M12 21.5c2.59 0 4.76-.86 6.34-2.33l-3.1-2.36c-.86.58-1.96.92-3.24.92-2.49 0-4.6-1.68-5.35-3.94H3.44v2.44C5.01 19.42 8.28 21.5 12 21.5Z" fill="#34A853"/>
+                  <path d="M6.65 13.79c-.19-.58-.3-1.2-.3-1.79s.11-1.21.3-1.79V7.77H3.44C2.81 9.02 2.45 10.43 2.45 12s.36 2.98.99 4.23l3.21-2.44Z" fill="#FBBC05"/>
+                  <path d="M12 6.27c1.41 0 2.68.49 3.68 1.45l2.76-2.76C16.76 3.4 14.59 2.5 12 2.5c-3.72 0-6.99 2.08-8.56 5.23l3.21 2.44C7.4 7.95 9.51 6.27 12 6.27Z" fill="#EA4335"/>
+                </svg>
+                <span>Continuar con Google</span>
+              </div>
+              <div className="google-button-native" ref={googleButtonRef} aria-hidden="true" />
+            </div>
           </>}
         {mode === "login" && <button type="button" className="auth-link-button" onClick={async () => {
           if (!email.trim() || !email.includes("@")) return setError("Escribe primero tu correo electrónico.");
